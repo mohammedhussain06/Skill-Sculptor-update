@@ -69,7 +69,7 @@ export default function QueryFormPage() {
 
     setIsLoading(true);
     try {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const user = JSON.parse(sessionStorage.getItem('user') || '{}');
       const userId = user._id ?? user.id;
       if (!userId) throw new Error("User not logged in");
 

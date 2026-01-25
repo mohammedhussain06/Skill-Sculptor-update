@@ -8,10 +8,21 @@ import verifyToken from "../middleware/verifyToken.js";
 
 const makeSearchLink = (base, queryParam, q) => `${base}${queryParam}${encodeURIComponent(q)}`;
 
+// Helper function to normalize skill name (convert hyphens to spaces, capitalize)
+const normalizeSkill = (skill) => {
+  if (!skill) return '';
+  // Convert hyphens to spaces and capitalize words
+  return skill
+    .split(/[-_]/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 const PROVIDERS = {
   youtube: async (skill, level) => {
+    const normalizedSkill = normalizeSkill(skill);
     const levelTerm = level === 'advanced' ? 'advanced' : level === 'intermediate' ? 'intermediate' : 'beginner';
-    const q = `${skill} ${levelTerm} tutorial`;
+    const q = `${normalizedSkill} ${levelTerm} tutorial`;
     // Prefer native YouTube Data API v3 if key provided
     if (process.env.YOUTUBE_API_KEY) {
       const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=6&q=${encodeURIComponent(q)}&key=${process.env.YOUTUBE_API_KEY}`;
@@ -37,25 +48,60 @@ const PROVIDERS = {
     ];
   },
   github: async (skill, level) => {
-    const q = `${skill} ${level || ''} awesome list`;
+    const normalizedSkill = normalizeSkill(skill);
+    const q = `${normalizedSkill} ${level || ''} awesome list`;
     const res = await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(q)}&sort=stars&order=desc&per_page=6`).catch(() => null);
     const data = await res?.json().catch(() => null);
     const items = data?.items || [];
     return items.map((r) => ({ title: r.full_name, url: r.html_url }));
   },
   stackoverflow: async (skill, level) => {
-    const q = `${skill} ${level || ''}`;
+    const normalizedSkill = normalizeSkill(skill);
+    const q = `${normalizedSkill} ${level || ''}`;
     const res = await fetch(`https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&q=${encodeURIComponent(q)}&site=stackoverflow&pagesize=6`).catch(() => null);
     const data = await res?.json().catch(() => null);
     const items = data?.items || [];
     return items.map((x) => ({ title: x.title, url: x.link }));
   },
-  // Static/search-based providers (no key needed)
-  mdn: async (skill) => [{ title: 'MDN Web Docs', url: makeSearchLink('https://developer.mozilla.org/en-US/search?q=', '', skill) }],
-  w3schools: async (skill) => [{ title: 'W3Schools', url: makeSearchLink('https://www.w3schools.com/howto/howto_css_searchbar.asp?q=', '', skill) }, { title: 'W3Schools Search', url: makeSearchLink('https://www.w3schools.com/search/?q=', '', skill) }],
-  freecodecamp: async (skill) => [{ title: 'freeCodeCamp', url: makeSearchLink('https://www.freecodecamp.org/learn/#', '', '') }, { title: `freeCodeCamp: ${skill}`, url: makeSearchLink('https://www.freecodecamp.org/news/search/?query=', '', skill) }],
-  coursera: async (skill, level) => [{ title: 'Coursera', url: makeSearchLink('https://www.coursera.org/search?query=', '', `${skill} ${level || ''}`) }],
-  udemy: async (skill, level) => [{ title: 'Udemy', url: makeSearchLink('https://www.udemy.com/courses/search/?q=', '', `${skill} ${level || ''}`) }],
+  // Static/search-based providers (no key needed) - now skill-specific
+  mdn: async (skill) => {
+    const normalizedSkill = normalizeSkill(skill);
+    return [
+      { title: `MDN Web Docs: ${normalizedSkill}`, url: makeSearchLink('https://developer.mozilla.org/en-US/search?q=', '', normalizedSkill) },
+      { title: 'MDN Web Docs', url: 'https://developer.mozilla.org/' }
+    ];
+  },
+  w3schools: async (skill) => {
+    const normalizedSkill = normalizeSkill(skill);
+    return [
+      { title: `W3Schools: ${normalizedSkill}`, url: makeSearchLink('https://www.w3schools.com/search/?q=', '', normalizedSkill) },
+      { title: 'W3Schools', url: 'https://www.w3schools.com/' }
+    ];
+  },
+  freecodecamp: async (skill) => {
+    const normalizedSkill = normalizeSkill(skill);
+    return [
+      { title: `freeCodeCamp: ${normalizedSkill}`, url: makeSearchLink('https://www.freecodecamp.org/news/search/?query=', '', normalizedSkill) },
+      { title: 'freeCodeCamp Curriculum', url: 'https://www.freecodecamp.org/learn/' },
+      { title: 'freeCodeCamp YouTube', url: 'https://www.youtube.com/c/Freecodecamp' }
+    ];
+  },
+  coursera: async (skill, level) => {
+    const normalizedSkill = normalizeSkill(skill);
+    const levelTerm = level || '';
+    return [
+      { title: `Coursera: ${normalizedSkill}`, url: makeSearchLink('https://www.coursera.org/search?query=', '', `${normalizedSkill} ${levelTerm}`) },
+      { title: 'Coursera Specializations', url: 'https://www.coursera.org/browse' }
+    ];
+  },
+  udemy: async (skill, level) => {
+    const normalizedSkill = normalizeSkill(skill);
+    const levelTerm = level || '';
+    return [
+      { title: `Udemy: ${normalizedSkill}`, url: makeSearchLink('https://www.udemy.com/courses/search/?q=', '', `${normalizedSkill} ${levelTerm}`) },
+      { title: 'Udemy Best Sellers', url: 'https://www.udemy.com/courses/development/' }
+    ];
+  },
 };
 
 const router = express.Router();
@@ -105,23 +151,26 @@ router.post("/", verifyToken, async (req, res, next) => {
 
     const choose = normalizedLevel === 'advanced' ? advancedResources : normalizedLevel === 'intermediate' ? intermediateResources : beginnerResources;
 
-    // Fallbacks if providers return nothing
+    // Normalize skill once at the top
+    const normalizedSkill = normalizeSkill(skill);
+
+    // Fallbacks if providers return nothing - skill-specific
     const fallback = [
-      { title: 'freeCodeCamp', url: 'https://www.freecodecamp.org/' },
-      { title: 'MDN Web Docs', url: 'https://developer.mozilla.org/' },
-      { title: 'Coursera', url: 'https://www.coursera.org/' },
-      { title: 'Udemy', url: 'https://www.udemy.com/' },
+      { title: `freeCodeCamp: ${normalizedSkill}`, url: `https://www.freecodecamp.org/news/search/?query=${encodeURIComponent(normalizedSkill)}` },
+      { title: `MDN Web Docs: ${normalizedSkill}`, url: `https://developer.mozilla.org/en-US/search?q=${encodeURIComponent(normalizedSkill)}` },
+      { title: `Coursera: ${normalizedSkill}`, url: `https://www.coursera.org/search?query=${encodeURIComponent(normalizedSkill)}` },
+      { title: `Udemy: ${normalizedSkill}`, url: `https://www.udemy.com/courses/search/?q=${encodeURIComponent(normalizedSkill)}` },
     ];
 
     const picked = (choose.length ? choose : fallback).slice(0, 15);
 
     const generatedSteps = [
-      { title: `Introduction to ${skill}`, status: "current", difficulty: normalizedLevel === 'advanced' ? 'Advanced' : normalizedLevel === 'intermediate' ? 'Intermediate' : 'Beginner', resources: picked },
-      { title: `${skill} Fundamentals`, status: "pending", difficulty: normalizedLevel, resources: picked },
-      { title: `Build ${skill} Projects`, status: "pending", difficulty: normalizedLevel, resources: picked },
+      { title: `Introduction to ${normalizedSkill}`, status: "current", difficulty: normalizedLevel === 'advanced' ? 'Advanced' : normalizedLevel === 'intermediate' ? 'Intermediate' : 'Beginner', resources: picked },
+      { title: `${normalizedSkill} Fundamentals`, status: "pending", difficulty: normalizedLevel, resources: picked },
+      { title: `Build ${normalizedSkill} Projects`, status: "pending", difficulty: normalizedLevel, resources: picked },
     ];
 
-    const roadmap = await Roadmap.create({ userId, skill, level: level || "beginner", steps: generatedSteps });
+    const roadmap = await Roadmap.create({ userId, skill: normalizedSkill, level: level || "beginner", steps: generatedSteps });
 
     // 2️⃣ Create the dashboard immediately after roadmap creation
     let dashboard = await Dashboard.findOne({ userId });

@@ -16,6 +16,16 @@ function dedupe(arr) {
   });
 }
 
+// Helper function to normalize skill name (convert hyphens to spaces, capitalize)
+const normalizeSkill = (skill) => {
+  if (!skill) return '';
+  // Convert hyphens to spaces and capitalize words
+  return skill
+    .split(/[-_]/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 // Helper to build diversified, level-aware resources
 async function buildResources(skill, levelTerm) {
   const ytPromise = (async () => {
@@ -42,42 +52,41 @@ async function buildResources(skill, levelTerm) {
   const soPromise = fetch(`https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&q=${encodeURIComponent(`${skill} ${levelTerm}`)}&site=stackoverflow&pagesize=10`)
     .then(r => r.ok ? r.json() : null).catch(() => null);
 
+  const normalizedSkill = normalizeSkill(skill);
   const mdn = [
-    { title: 'MDN Web Docs', url: `https://developer.mozilla.org/en-US/search?q=${encodeURIComponent(skill)}` },
-    { title: 'MDN JavaScript Guide', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide' },
-    { title: 'MDN CSS Guide', url: 'https://developer.mozilla.org/en-US/docs/Web/CSS' }
+    { title: `MDN Web Docs: ${normalizedSkill}`, url: `https://developer.mozilla.org/en-US/search?q=${encodeURIComponent(normalizedSkill)}` },
+    { title: 'MDN Web Docs', url: 'https://developer.mozilla.org/' }
   ];
   const w3 = [
-    { title: 'W3Schools', url: `https://www.w3schools.com/search/?q=${encodeURIComponent(skill)}` },
-    { title: 'W3Schools Tutorials', url: 'https://www.w3schools.com/' },
-    { title: 'W3Schools Examples', url: 'https://www.w3schools.com/html/html_examples.asp' }
+    { title: `W3Schools: ${normalizedSkill}`, url: `https://www.w3schools.com/search/?q=${encodeURIComponent(normalizedSkill)}` },
+    { title: 'W3Schools', url: 'https://www.w3schools.com/' }
   ];
   const fcc = [
-    { title: 'freeCodeCamp', url: `https://www.freecodecamp.org/news/search/?query=${encodeURIComponent(skill)}` },
+    { title: `freeCodeCamp: ${normalizedSkill}`, url: `https://www.freecodecamp.org/news/search/?query=${encodeURIComponent(normalizedSkill)}` },
     { title: 'freeCodeCamp Curriculum', url: 'https://www.freecodecamp.org/learn/' },
     { title: 'freeCodeCamp YouTube', url: 'https://www.youtube.com/c/Freecodecamp' }
   ];
   const coursera = [
-    { title: 'Coursera', url: `https://www.coursera.org/search?query=${encodeURIComponent(`${skill} ${levelTerm}`)}` },
+    { title: `Coursera: ${normalizedSkill}`, url: `https://www.coursera.org/search?query=${encodeURIComponent(`${normalizedSkill} ${levelTerm}`)}` },
     { title: 'Coursera Specializations', url: 'https://www.coursera.org/browse' },
     { title: 'Coursera Professional Certificates', url: 'https://www.coursera.org/professional-certificates' }
   ];
   const udemy = [
-    { title: 'Udemy', url: `https://www.udemy.com/courses/search/?q=${encodeURIComponent(`${skill} ${levelTerm}`)}` },
+    { title: `Udemy: ${normalizedSkill}`, url: `https://www.udemy.com/courses/search/?q=${encodeURIComponent(`${normalizedSkill} ${levelTerm}`)}` },
     { title: 'Udemy Best Sellers', url: 'https://www.udemy.com/courses/development/' },
     { title: 'Udemy Free Courses', url: 'https://www.udemy.com/courses/free/' }
   ];
   
-  // Additional resource sources
+  // Additional resource sources - skill-specific
   const additionalResources = [
     { title: 'GitHub Learning Lab', url: 'https://lab.github.com/' },
-    { title: 'Codecademy', url: `https://www.codecademy.com/search?query=${encodeURIComponent(skill)}` },
-    { title: 'Khan Academy', url: `https://www.khanacademy.org/search?page_search_query=${encodeURIComponent(skill)}` },
-    { title: 'edX', url: `https://www.edx.org/search?q=${encodeURIComponent(`${skill} ${levelTerm}`)}` },
-    { title: 'MIT OpenCourseWare', url: `https://ocw.mit.edu/search/?d=Electrical%20Engineering%20and%20Computer%20Science&s=${encodeURIComponent(skill)}` },
+    { title: `Codecademy: ${normalizedSkill}`, url: `https://www.codecademy.com/search?query=${encodeURIComponent(normalizedSkill)}` },
+    { title: `Khan Academy: ${normalizedSkill}`, url: `https://www.khanacademy.org/search?page_search_query=${encodeURIComponent(normalizedSkill)}` },
+    { title: `edX: ${normalizedSkill}`, url: `https://www.edx.org/search?q=${encodeURIComponent(`${normalizedSkill} ${levelTerm}`)}` },
+    { title: `MIT OpenCourseWare: ${normalizedSkill}`, url: `https://ocw.mit.edu/search/?d=Electrical%20Engineering%20and%20Computer%20Science&s=${encodeURIComponent(normalizedSkill)}` },
     { title: 'Reddit Programming', url: 'https://www.reddit.com/r/programming/' },
-    { title: 'Dev.to', url: `https://dev.to/search?q=${encodeURIComponent(skill)}` },
-    { title: 'Medium Programming', url: `https://medium.com/search?q=${encodeURIComponent(skill)}` }
+    { title: `Dev.to: ${normalizedSkill}`, url: `https://dev.to/search?q=${encodeURIComponent(normalizedSkill)}` },
+    { title: `Medium: ${normalizedSkill}`, url: `https://medium.com/search?q=${encodeURIComponent(normalizedSkill)}` }
   ];
 
   const [ytData, ghData, soData] = await Promise.all([ytPromise, ghPromise, soPromise]);
@@ -129,19 +138,20 @@ router.post("/", passport.authenticate("jwt", { session: false }), async (req, r
 
     const resolvedGoal = goal || `Learn ${skill}`;
 
+    const normalizedSkill = normalizeSkill(skill);
     const levelTerm = level === 'advanced' ? 'advanced' : level === 'intermediate' ? 'intermediate' : 'beginner';
-    const src = await buildResources(skill, levelTerm);
+    const src = await buildResources(normalizedSkill, levelTerm);
     const intro = dedupe([ ...src.yt.slice(0,4), ...src.docs.slice(0,3), ...src.fcc.slice(0,3), ...src.courses.slice(0,2), ...src.pool.slice(0,5) ]).slice(0,12);
     const fundamentals = dedupe([ ...src.docs.slice(0,4), ...src.so.slice(0,4), ...src.yt.slice(3,7), ...src.courses.slice(0,3), ...src.pool.slice(5,10) ]).slice(0,12);
     const projects = dedupe([ ...src.gh.slice(0,6), ...src.so.slice(3,7), ...src.docs.slice(0,2), ...src.pool.slice(10,15) ]).slice(0,12);
 
     const steps = [
-      { title: levelTerm === 'advanced' ? `Advanced ${skill} Concepts` : levelTerm === 'intermediate' ? `${skill} Fundamentals` : `Introduction to ${skill}`, status: "current", difficulty: levelTerm === 'advanced' ? 'Advanced' : levelTerm === 'intermediate' ? 'Intermediate' : 'Beginner', resources: intro },
-      { title: levelTerm === 'advanced' ? `Scalable ${skill} Architectures` : levelTerm === 'intermediate' ? `Intermediate ${skill} Projects` : `${skill} Basics Practice`, status: "pending", difficulty: levelTerm, resources: fundamentals },
-      { title: levelTerm === 'advanced' ? `Performance & Optimization in ${skill}` : levelTerm === 'intermediate' ? `Apply ${skill} in Real Projects` : `First ${skill} Project`, status: "pending", difficulty: levelTerm, resources: projects },
+      { title: levelTerm === 'advanced' ? `Advanced ${normalizedSkill} Concepts` : levelTerm === 'intermediate' ? `${normalizedSkill} Fundamentals` : `Introduction to ${normalizedSkill}`, status: "current", difficulty: levelTerm === 'advanced' ? 'Advanced' : levelTerm === 'intermediate' ? 'Intermediate' : 'Beginner', resources: intro },
+      { title: levelTerm === 'advanced' ? `Scalable ${normalizedSkill} Architectures` : levelTerm === 'intermediate' ? `Intermediate ${normalizedSkill} Projects` : `${normalizedSkill} Basics Practice`, status: "pending", difficulty: levelTerm, resources: fundamentals },
+      { title: levelTerm === 'advanced' ? `Performance & Optimization in ${normalizedSkill}` : levelTerm === 'intermediate' ? `Apply ${normalizedSkill} in Real Projects` : `First ${normalizedSkill} Project`, status: "pending", difficulty: levelTerm, resources: projects },
     ];
 
-    const roadmap = await Roadmap.create({ userId, skill, level, goal: resolvedGoal, steps });
+    const roadmap = await Roadmap.create({ userId, skill: normalizedSkill, level, goal: resolvedGoal, steps });
     res.status(201).json({ message: "Roadmap created", roadmap });
   } catch (err) {
     next(err);
@@ -157,8 +167,9 @@ router.get("/user/:userId", passport.authenticate("jwt", { session: false }), as
     // Enrich existing roadmaps that lack resource URLs
     const needsEnrich = !roadmap.steps?.[0]?.resources?.[0]?.url;
     if (needsEnrich) {
+      const normalizedSkill = normalizeSkill(roadmap.skill);
       const levelTerm = roadmap.level === 'advanced' ? 'advanced' : roadmap.level === 'intermediate' ? 'intermediate' : 'beginner';
-      const src = await buildResources(roadmap.skill, levelTerm);
+      const src = await buildResources(normalizedSkill, levelTerm);
       // Distinct resources per step
       const intro = dedupe([ ...src.yt.slice(0,4), ...src.docs.slice(0,3), ...src.fcc.slice(0,3), ...src.courses.slice(0,2), ...src.pool.slice(0,5) ]).slice(0,12);
       const fundamentals = dedupe([ ...src.docs.slice(0,4), ...src.so.slice(0,4), ...src.yt.slice(3,7), ...src.courses.slice(0,3), ...src.pool.slice(5,10) ]).slice(0,12);
@@ -190,8 +201,9 @@ router.get("/:id", passport.authenticate("jwt", { session: false }), async (req,
     if (!roadmap) return res.status(404).json({ message: "Roadmap not found" });
     const needsEnrich = !roadmap.steps?.[0]?.resources?.[0]?.url;
     if (needsEnrich) {
+      const normalizedSkill = normalizeSkill(roadmap.skill);
       const levelTerm = roadmap.level === 'advanced' ? 'advanced' : roadmap.level === 'intermediate' ? 'intermediate' : 'beginner';
-      const src = await buildResources(roadmap.skill, levelTerm);
+      const src = await buildResources(normalizedSkill, levelTerm);
       const intro = dedupe([ ...src.yt.slice(0,3), ...src.docs.slice(0,2), ...src.fcc.slice(0,2), ...src.courses.slice(0,1) ]).slice(0,8);
       const fundamentals = dedupe([ ...src.docs.slice(0,3), ...src.so.slice(0,3), ...src.yt.slice(2,5), ...src.courses.slice(0,2) ]).slice(0,8);
       const projects = dedupe([ ...src.gh.slice(0,5), ...src.so.slice(2,5), ...src.docs.slice(0,1) ]).slice(0,8);
