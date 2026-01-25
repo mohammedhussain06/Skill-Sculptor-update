@@ -89,8 +89,8 @@ export default function SignupPage() {
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">Create Your Account</h1>
           <p className="text-base text-white/80">Start your learning journey with SkillSculptor</p>
-        </div>
-        
+          </div>
+          
         {/* Form Card */}
         <Card className="border-0 shadow-lg bg-card/95 backdrop-blur-sm">
           <CardHeader>
@@ -98,52 +98,52 @@ export default function SignupPage() {
             <CardDescription className="text-white/70">Enter your details to create your account</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
                 <Label htmlFor="username" className="text-white">Username</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
-                  <Input
-                    id="username"
-                    name="username"
-                    placeholder="johndoe"
-                    required
-                    value={formData.username}
-                    onChange={handleInputChange}
+              <Input
+                id="username"
+                name="username"
+                placeholder="johndoe"
+                required
+                value={formData.username}
+                onChange={handleInputChange}
                     className="pl-10 bg-muted/50 border-border/50 text-white placeholder:text-muted-foreground"
-                  />
+              />
                 </div>
-              </div>
-              
-              <div className="space-y-2">
+            </div>
+            
+            <div className="space-y-2">
                 <Label htmlFor="email" className="text-white">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
+              <Input
+                id="email"
+                name="email"
+                type="email"
                     placeholder="Enter your email"
-                    required
-                    value={formData.email}
-                    onChange={handleInputChange}
+                required
+                value={formData.email}
+                onChange={handleInputChange}
                     className="pl-10 bg-muted/50 border-border/50 text-white placeholder:text-muted-foreground"
-                  />
+              />
                 </div>
-              </div>
-              
-              <div className="space-y-2">
+            </div>
+            
+            <div className="space-y-2">
                 <Label htmlFor="password" className="text-white">Password</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
-                  <Input
-                    id="password"
-                    name="password"
+              <Input
+                id="password"
+                name="password"
                     type={showPassword ? "text" : "password"}
-                    required
-                    minLength={6}
-                    value={formData.password}
-                    onChange={handleInputChange}
+                required
+                minLength={6}
+                value={formData.password}
+                onChange={handleInputChange}
                     className="pl-10 pr-10 bg-muted/50 border-border/50 text-white placeholder:text-muted-foreground"
                   />
                   <button
@@ -154,21 +154,21 @@ export default function SignupPage() {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
-              </div>
-              
-              <div className="space-y-2">
+            </div>
+            
+            <div className="space-y-2">
                 <Label htmlFor="confirmPassword" className="text-white">Confirm Password</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Enter your confirm password"
-                    required
-                    minLength={6}
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
+                required
+                minLength={6}
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
                     className="pl-10 pr-10 bg-muted/50 border-border/50 text-white placeholder:text-muted-foreground"
                   />
                   <button
@@ -179,22 +179,22 @@ export default function SignupPage() {
                     {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
-              </div>
-              
-              <Button type="submit" className="w-full bg-gradient-primary hover:opacity-90 border-0" disabled={isLoading}>
-                {isLoading ? 'Creating account...' : 'Create Account'}
-              </Button>
-            </form>
+            </div>
             
+              <Button type="submit" className="w-full bg-gradient-primary hover:opacity-90 border-0" disabled={isLoading}>
+              {isLoading ? 'Creating account...' : 'Create Account'}
+            </Button>
+          </form>
+          
             <p className="mt-6 text-center text-sm text-white/70">
-              Already have an account?{' '}
-              <Link
-                to="/login"
+            Already have an account?{' '}
+            <Link
+              to="/login"
                 className="underline underline-offset-4 hover:text-primary text-primary"
-              >
-                Login
-              </Link>
-            </p>
+            >
+              Login
+            </Link>
+          </p>
           </CardContent>
         </Card>
       </div>

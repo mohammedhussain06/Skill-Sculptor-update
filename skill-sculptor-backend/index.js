@@ -23,12 +23,29 @@ const app = express();
 
 // CORS configuration - allow frontend URL
 const corsOptions = {
-  origin: [
-    'http://localhost:8081',
-    'http://localhost:8080', 
-    'https://skill-sculptor-2.onrender.com',
-    process.env.FRONTEND_URL
-  ].filter(Boolean),
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:8081',
+      'http://localhost:8080',
+      'http://localhost:5173', // Vite dev server
+      'https://skill-sculptor-2.onrender.com',
+      process.env.FRONTEND_URL
+    ].filter(Boolean);
+    
+    // Allow all Render.com subdomains
+    if (origin.includes('.onrender.com')) {
+      return callback(null, true);
+    }
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200
 };

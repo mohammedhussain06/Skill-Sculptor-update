@@ -48,56 +48,56 @@ function App() {
             <AuthProvider>
               <div className="min-h-screen bg-background flex flex-col">
                 <Navigation />
-                <Routes>
+                  <Routes>
                   {/* HomePage - full width, no container */}
-                  <Route path="/" element={<HomePage />} />
+                    <Route path="/" element={<HomePage />} />
                   
                   {/* Auth pages - full width */}
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/signup" element={<SignupPage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/signup" element={<SignupPage />} />
                   
                   {/* Public generation routes - full width */}
                   <Route path="/flashcards/generate" element={<FlashcardGeneratePage />} />
                   <Route path="/quiz/generate" element={<QuizGeneratePage />} />
                   <Route path="/upload" element={<UploadPage />} />
-                  
-                  {/* Protected routes */}
-                  <Route
-                    path="/dashboard"
-                    element={
-                      <ProtectedRoute>
-                        <DashboardPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/query-form"
-                    element={
-                      <ProtectedRoute>
-                        <QueryFormPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/flashcards"
-                    element={
-                      <ProtectedRoute>
-                        <FlashcardsPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/quiz"
-                    element={
-                      <ProtectedRoute>
+                    
+                    {/* Protected routes */}
+                    <Route
+                      path="/dashboard"
+                      element={
+                        <ProtectedRoute>
+                          <DashboardPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/query-form"
+                      element={
+                        <ProtectedRoute>
+                          <QueryFormPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/flashcards"
+                      element={
+                        <ProtectedRoute>
+                          <FlashcardsPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/quiz"
+                      element={
+                        <ProtectedRoute>
                         <QuizListPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/progress"
-                    element={
-                      <ProtectedRoute>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/progress"
+                      element={
+                        <ProtectedRoute>
                         <AnalyticsPage />
                       </ProtectedRoute>
                     }
@@ -123,13 +123,13 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <LearnStepPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  
-                  {/* Redirect any unknown routes to home */}
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
+                        </ProtectedRoute>
+                      }
+                    />
+                    
+                    {/* Redirect any unknown routes to home */}
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
                 <AuthModal />
                 <Toaster />
               </div>

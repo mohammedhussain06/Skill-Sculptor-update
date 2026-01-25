@@ -123,23 +123,23 @@ export default function HomePage() {
           </div>
         </div>
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 md:py-32 text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6">
-            Sculpt Your Skills, <span className="gradient-text">Step by Step</span>
-          </h1>
-          <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-3xl mx-auto mb-8 sm:mb-12">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6">
+              Sculpt Your Skills, <span className="gradient-text">Step by Step</span>
+            </h1>
+            <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-3xl mx-auto mb-8 sm:mb-12">
             Generate personalized learning roadmaps tailored to your goals and skill level. Transform your ambitions into actionable learning paths with SkillSculptor.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <Button size="lg" asChild className="text-sm sm:text-base md:text-lg px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 bg-gradient-primary hover:opacity-90 border-0">
-              <Link to={isAuthenticated ? "/dashboard" : "/signup"}>
+                <Link to={isAuthenticated ? "/dashboard" : "/signup"}>
                 <span>Start Your Journey</span>
-                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 ml-2" />
-              </Link>
-            </Button>
-            
-            <Button variant="outline" size="lg" asChild className="text-sm sm:text-base md:text-lg px-5 sm:px-6 md:px-8 py-2.5 sm:py-3">
-              <Link to="/login">I Already Have an Account</Link>
-            </Button>
+                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 ml-2" />
+                </Link>
+              </Button>
+              
+              <Button variant="outline" size="lg" asChild className="text-sm sm:text-base md:text-lg px-5 sm:px-6 md:px-8 py-2.5 sm:py-3">
+                <Link to="/login">I Already Have an Account</Link>
+              </Button>
           </div>
         </div>
       </section>

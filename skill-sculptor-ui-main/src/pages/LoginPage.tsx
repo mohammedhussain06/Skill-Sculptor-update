@@ -76,8 +76,8 @@ export default function LoginPage() {
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">Welcome Back</h1>
           <p className="text-base text-white/80">Enter your email and password to sign in</p>
-        </div>
-        
+          </div>
+          
         {/* Form Card */}
         <Card className="border-0 shadow-lg bg-card/95 backdrop-blur-sm">
           <CardHeader>
@@ -85,43 +85,43 @@ export default function LoginPage() {
             <CardDescription className="text-white/70">Enter your credentials to access your account</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
                 <Label htmlFor="email" className="text-white">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
+              <Input
+                id="email"
+                name="email"
+                type="email"
                     placeholder="Enter your email"
-                    required
-                    value={formData.email}
-                    onChange={handleInputChange}
+                required
+                value={formData.email}
+                onChange={handleInputChange}
                     className="pl-10 bg-muted/50 border-border/50 text-white placeholder:text-muted-foreground"
-                  />
+              />
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
                   <Label htmlFor="password" className="text-white">Password</Label>
-                  <Link
-                    to="/forgot-password"
-                    className="text-sm text-primary hover:underline"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-primary hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
-                  <Input
-                    id="password"
-                    name="password"
+              <Input
+                id="password"
+                name="password"
                     type={showPassword ? "text" : "password"}
-                    required
-                    value={formData.password}
-                    onChange={handleInputChange}
+                required
+                value={formData.password}
+                onChange={handleInputChange}
                     className="pl-10 pr-10 bg-muted/50 border-border/50 text-white placeholder:text-muted-foreground"
                   />
                   <button
@@ -132,22 +132,22 @@ export default function LoginPage() {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
-              </div>
-              
-              <Button type="submit" className="w-full bg-gradient-primary hover:opacity-90 border-0" disabled={isLoading}>
-                {isLoading ? 'Signing in...' : 'Sign In'}
-              </Button>
-            </form>
+            </div>
             
+              <Button type="submit" className="w-full bg-gradient-primary hover:opacity-90 border-0" disabled={isLoading}>
+              {isLoading ? 'Signing in...' : 'Sign In'}
+            </Button>
+          </form>
+          
             <p className="mt-6 text-center text-sm text-white/70">
-              Don't have an account?{' '}
-              <Link
-                to="/signup"
+            Don't have an account?{' '}
+            <Link
+              to="/signup"
                 className="underline underline-offset-4 hover:text-primary text-primary"
-              >
-                Sign up
-              </Link>
-            </p>
+            >
+              Sign up
+            </Link>
+          </p>
           </CardContent>
         </Card>
       </div>

@@ -30,14 +30,14 @@ export default function LearnStepPage() {
   useEffect(() => {
     const run = async () => {
       try {
-        const { data } = await API.get(`/roadmap/${roadmapId}`);
-        const idx = Number(stepIndex || 0);
-        setStep(data?.steps?.[idx] || null);
-        
-        // Load saved completed resources
-        if (roadmapId && stepIndex !== undefined) {
-          const savedResources = loadCompletedResources(roadmapId, stepIndex);
-          setCompletedResources(savedResources);
+      const { data } = await API.get(`/roadmap/${roadmapId}`);
+      const idx = Number(stepIndex || 0);
+      setStep(data?.steps?.[idx] || null);
+      
+      // Load saved completed resources
+      if (roadmapId && stepIndex !== undefined) {
+        const savedResources = loadCompletedResources(roadmapId, stepIndex);
+        setCompletedResources(savedResources);
         }
       } catch (error: any) {
         toast({

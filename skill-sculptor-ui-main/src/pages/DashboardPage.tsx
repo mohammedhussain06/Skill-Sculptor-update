@@ -359,16 +359,16 @@ export default function DashboardPage() {
                           asChild 
                           className={`w-full justify-start h-auto p-2 sm:p-3 md:p-4 text-xs sm:text-sm ${action.variant === "default" ? "btn-student bg-gradient-primary hover:opacity-90 border-0 text-white" : ""}`}
                         >
-                          <Link to={action.action}>
-                            <div className="flex items-center space-x-2 sm:space-x-3 w-full">
-                              <action.icon className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 shrink-0" />
-                              <div className="text-left min-w-0 flex-1">
-                                <p className="font-medium text-xs sm:text-sm md:text-base break-words">{action.title}</p>
-                                <p className="text-xs text-muted-foreground break-words line-clamp-2">{action.description}</p>
-                              </div>
-                            </div>
-                          </Link>
-                        </Button>
+                      <Link to={action.action}>
+                        <div className="flex items-center space-x-2 sm:space-x-3 w-full">
+                          <action.icon className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 shrink-0" />
+                          <div className="text-left min-w-0 flex-1">
+                            <p className="font-medium text-xs sm:text-sm md:text-base break-words">{action.title}</p>
+                            <p className="text-xs text-muted-foreground break-words line-clamp-2">{action.description}</p>
+                          </div>
+                        </div>
+                      </Link>
+                    </Button>
                       );
                     }
                   })}
