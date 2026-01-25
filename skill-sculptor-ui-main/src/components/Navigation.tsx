@@ -47,8 +47,8 @@ export function Navigation() {
             </Button>
             
             <Link to={isAuthenticated ? '/dashboard' : '/'} className="flex items-center space-x-2 group">
-              <div className="p-2 rounded-lg bg-gradient-primary group-hover:shadow-glow transition-all duration-300">
-                <Sparkles className="w-5 h-5 text-white" />
+              <div className="p-2 rounded-lg bg-gradient-primary group-hover:shadow-glow transition-all duration-300 constant-glow">
+                <Sparkles className="w-5 h-5 text-white sparkle" />
               </div>
               <span className="text-xl font-bold gradient-text hidden sm:block">SkillSculptor</span>
               <span className="text-xl font-bold gradient-text sm:hidden">SS</span>

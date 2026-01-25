@@ -49,74 +49,101 @@ const QuizListPage = () => {
 
     return (
         <div className="min-h-screen bg-background">
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
                 <div className="max-w-6xl mx-auto">
-                    <div className="flex justify-between items-center mb-8">
-                        <div>
-                            <h1 className="text-4xl font-bold mb-2">My Quizzes</h1>
-                            <p className="text-muted-foreground">
-                                Challenge yourself and track your progress
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 mb-6 sm:mb-8 md:mb-12">
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="achievement-badge p-2 sm:p-3">
+                                    <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                                </div>
+                                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold gradient-text">My Quizzes</h1>
+                            </div>
+                            <p className="text-sm sm:text-base text-muted-foreground">
+                                Challenge yourself and track your progress 🎯
                             </p>
                         </div>
-                        <Button onClick={() => navigate("/upload")}>
+                        <Button 
+                            onClick={() => navigate("/upload")} 
+                            className="w-full sm:w-auto bg-gradient-primary hover:opacity-90 border-0 text-sm sm:text-base"
+                        >
                             <Plus className="w-4 h-4 mr-2" />
                             Create Quiz
                         </Button>
                     </div>
 
                     {quizzes.length === 0 ? (
-                        <Card>
-                            <CardContent className="flex flex-col items-center justify-center py-16">
-                                <BookOpen className="w-16 h-16 text-muted-foreground mb-4" />
-                                <h2 className="text-2xl font-bold mb-2">No Quizzes Yet</h2>
-                                <p className="text-muted-foreground mb-4">
-                                    Upload a document to generate your first quiz
+                        <Card className="fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm">
+                            <CardContent className="flex flex-col items-center justify-center py-12 sm:py-16 md:py-20 px-4">
+                                <div className="achievement-badge p-4 sm:p-6 mb-4 sm:mb-6">
+                                    <BookOpen className="w-8 h-8 sm:w-12 sm:h-12 text-white" />
+                                </div>
+                                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3 text-center">No Quizzes Yet</h2>
+                                <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 text-center max-w-md">
+                                    Upload a document to generate your first quiz and start your learning journey! 🚀
                                 </p>
-                                <Button onClick={() => navigate("/upload")}>
+                                <Button 
+                                    onClick={() => navigate("/upload")}
+                                    className="bg-gradient-primary hover:opacity-90 border-0 text-sm sm:text-base"
+                                >
+                                    <Plus className="w-4 h-4 mr-2" />
                                     Get Started
                                 </Button>
                             </CardContent>
                         </Card>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {quizzes.map((quiz) => (
-                                <Card key={quiz._id} className="hover:shadow-lg transition-shadow">
-                                    <CardHeader>
-                                        <div className="flex justify-between items-start">
-                                            <CardTitle className="line-clamp-2">{quiz.title}</CardTitle>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                            {quizzes.map((quiz, index) => (
+                                <Card 
+                                    key={quiz._id} 
+                                    className="fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300"
+                                    style={{ animationDelay: `${index * 0.1}s` }}
+                                >
+                                    <CardHeader className="p-4 sm:p-6">
+                                        <div className="flex justify-between items-start gap-2">
+                                            <CardTitle className="line-clamp-2 text-base sm:text-lg md:text-xl flex-1 min-w-0">{quiz.title}</CardTitle>
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => deleteQuiz(quiz._id)}
+                                                className="shrink-0 h-8 w-8 p-0"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
                                         </div>
                                         {quiz.description && (
-                                            <CardDescription className="line-clamp-2">
+                                            <CardDescription className="line-clamp-2 text-xs sm:text-sm mt-2">
                                                 {quiz.description}
                                             </CardDescription>
                                         )}
                                     </CardHeader>
-                                    <CardContent className="space-y-4">
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-muted-foreground">Questions:</span>
-                                            <Badge variant="outline">{quiz.questions.length}</Badge>
+                                    <CardContent className="p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4">
+                                        <div className="flex justify-between items-center text-xs sm:text-sm">
+                                            <span className="text-muted-foreground flex items-center gap-1">
+                                                <span>📝</span> Questions:
+                                            </span>
+                                            <Badge variant="outline" className="text-xs">{quiz.questions.length}</Badge>
                                         </div>
                                         {quiz.totalAttempts > 0 && (
                                             <>
-                                                <div className="flex justify-between text-sm">
-                                                    <span className="text-muted-foreground">Attempts:</span>
-                                                    <Badge variant="outline">{quiz.totalAttempts}</Badge>
+                                                <div className="flex justify-between items-center text-xs sm:text-sm">
+                                                    <span className="text-muted-foreground flex items-center gap-1">
+                                                        <span>🔄</span> Attempts:
+                                                    </span>
+                                                    <Badge variant="outline" className="text-xs">{quiz.totalAttempts}</Badge>
                                                 </div>
-                                                <div className="flex justify-between text-sm">
-                                                    <span className="text-muted-foreground">Avg Score:</span>
-                                                    <Badge>{quiz.averageScore.toFixed(1)}%</Badge>
+                                                <div className="flex justify-between items-center text-xs sm:text-sm">
+                                                    <span className="text-muted-foreground flex items-center gap-1">
+                                                        <span>⭐</span> Avg Score:
+                                                    </span>
+                                                    <Badge className="text-xs bg-gradient-primary text-white">
+                                                        {quiz.averageScore.toFixed(1)}%
+                                                    </Badge>
                                                 </div>
                                             </>
                                         )}
                                         <Button 
-                                            className="w-full" 
+                                            className="w-full bg-gradient-primary hover:opacity-90 border-0 text-sm sm:text-base mt-2" 
                                             onClick={() => navigate(`/quiz/${quiz._id}/take`)}
                                         >
                                             <Trophy className="w-4 h-4 mr-2" />

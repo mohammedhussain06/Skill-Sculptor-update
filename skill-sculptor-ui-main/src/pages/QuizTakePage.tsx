@@ -7,8 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
-import { Clock, Trophy, Award, TrendingUp } from "lucide-react";
-import { Navigation } from "@/components/Navigation";
+import { Clock, Trophy, Award, TrendingUp, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const QuizTakePage = () => {
@@ -79,9 +78,11 @@ const QuizTakePage = () => {
     if (loading || !quiz) {
         return (
             <div className="min-h-screen bg-background">
-                <Navigation />
                 <div className="flex items-center justify-center h-screen">
-                    <p>Loading quiz...</p>
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                        <p className="text-muted-foreground">Loading quiz...</p>
+                    </div>
                 </div>
             </div>
         );
@@ -90,31 +91,38 @@ const QuizTakePage = () => {
     if (showResults && results) {
         return (
             <div className="min-h-screen bg-background">
-                <Navigation />
                 <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
                     <div className="max-w-2xl mx-auto">
-                        <Card className="mb-4 sm:mb-6">
+                        <Card className="fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm mb-4 sm:mb-6">
                             <CardHeader className="text-center p-4 sm:p-6">
-                                <Trophy className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-3 sm:mb-4 text-yellow-500" />
-                                <CardTitle className="text-xl sm:text-2xl md:text-3xl">Quiz Completed!</CardTitle>
+                                <div className="achievement-badge w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4 flex items-center justify-center">
+                                    <Trophy className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />
+                                </div>
+                                <CardTitle className="text-xl sm:text-2xl md:text-3xl gradient-text">Quiz Completed! 🎉</CardTitle>
                                 <CardDescription className="text-sm sm:text-base">Here are your results</CardDescription>
                             </CardHeader>
                             <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
                                 <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                                    <Card>
+                                    <Card className="fun-card border-0 shadow-card bg-gradient-to-br from-primary/10 to-primary/5">
                                         <CardContent className="pt-4 sm:pt-6 text-center">
-                                            <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-1 sm:mb-2">
+                                            <div className="text-2xl sm:text-3xl md:text-4xl font-bold gradient-text mb-1 sm:mb-2">
                                                 {results.percentage.toFixed(1)}%
                                             </div>
-                                            <div className="text-xs sm:text-sm text-muted-foreground">Score</div>
+                                            <div className="text-xs sm:text-sm text-muted-foreground flex items-center justify-center gap-1">
+                                                <Trophy className="w-3 h-3" />
+                                                Score
+                                            </div>
                                         </CardContent>
                                     </Card>
-                                    <Card>
+                                    <Card className="fun-card border-0 shadow-card bg-gradient-to-br from-green-500/10 to-green-500/5">
                                         <CardContent className="pt-4 sm:pt-6 text-center">
                                             <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-green-600 mb-1 sm:mb-2">
                                                 +{results.xpEarned}
                                             </div>
-                                            <div className="text-xs sm:text-sm text-muted-foreground">XP Earned</div>
+                                            <div className="text-xs sm:text-sm text-muted-foreground flex items-center justify-center gap-1">
+                                                <Award className="w-3 h-3" />
+                                                XP Earned
+                                            </div>
                                         </CardContent>
                                     </Card>
                                 </div>
@@ -209,10 +217,19 @@ const QuizTakePage = () => {
                                 </div>
 
                                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                                    <Button className="flex-1 text-sm sm:text-base" onClick={() => navigate("/quiz")}>
+                                    <Button 
+                                        className="flex-1 text-sm sm:text-base bg-gradient-primary hover:opacity-90 border-0" 
+                                        onClick={() => navigate("/quiz")}
+                                    >
+                                        <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
                                         Back to Quizzes
                                     </Button>
-                                    <Button className="flex-1 text-sm sm:text-base" variant="outline" onClick={() => window.location.reload()}>
+                                    <Button 
+                                        className="flex-1 text-sm sm:text-base" 
+                                        variant="outline" 
+                                        onClick={() => window.location.reload()}
+                                    >
+                                        <Trophy className="w-4 h-4 mr-2" />
                                         Retake Quiz
                                     </Button>
                                 </div>
@@ -229,24 +246,29 @@ const QuizTakePage = () => {
 
     return (
         <div className="min-h-screen bg-background">
-            <Navigation />
             <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
                 <div className="max-w-2xl mx-auto">
                     <div className="mb-4 sm:mb-6">
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 mb-2">
-                            <h1 className="text-xl sm:text-2xl font-bold break-words">{quiz.title}</h1>
-                            <Badge variant="outline" className="text-xs sm:text-sm shrink-0">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
+                            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold break-words gradient-text">{quiz.title}</h1>
+                            <Badge variant="outline" className="text-xs sm:text-sm shrink-0 bg-gradient-primary text-white border-0">
                                 Q{currentQuestion + 1} / {quiz.questions.length}
                             </Badge>
                         </div>
-                        <Progress value={progress} className="h-1.5 sm:h-2" />
+                        <div className="relative">
+                            <Progress value={progress} className="h-2 sm:h-3 progress-fun" />
+                            <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                                <span>{currentQuestion + 1} of {quiz.questions.length}</span>
+                                <span>{Math.round(progress)}%</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <Card>
+                    <Card className="fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm">
                         <CardHeader className="p-4 sm:p-6">
                             <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
                                 <CardTitle className="text-base sm:text-lg md:text-xl break-words flex-1">{question.question}</CardTitle>
-                                <Badge className="text-xs shrink-0">{question.difficulty}</Badge>
+                                <Badge className="text-xs shrink-0 bg-gradient-primary text-white">{question.difficulty}</Badge>
                             </div>
                         </CardHeader>
                         <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
@@ -255,7 +277,11 @@ const QuizTakePage = () => {
                                     {question.options.map((option: string, index: number) => (
                                         <div
                                             key={index}
-                                            className="flex items-center space-x-2 sm:space-x-3 border rounded-lg p-3 sm:p-4 cursor-pointer hover:bg-accent"
+                                            className={`flex items-center space-x-2 sm:space-x-3 border-2 rounded-lg p-3 sm:p-4 cursor-pointer transition-all duration-200 ${
+                                                selectedAnswer === index 
+                                                    ? 'border-primary bg-primary/10 shadow-md' 
+                                                    : 'border-border hover:border-primary/50 hover:bg-accent/50'
+                                            }`}
                                             onClick={() => setSelectedAnswer(index)}
                                         >
                                             <RadioGroupItem value={index.toString()} id={`option-${index}`} className="shrink-0" />
@@ -270,8 +296,21 @@ const QuizTakePage = () => {
                                 </div>
                             </RadioGroup>
 
-                            <Button onClick={handleNext} className="w-full text-sm sm:text-base" disabled={selectedAnswer === null}>
-                                {currentQuestion < quiz.questions.length - 1 ? "Next Question" : "Submit Quiz"}
+                            <Button 
+                                onClick={handleNext} 
+                                className="w-full text-sm sm:text-base bg-gradient-primary hover:opacity-90 border-0" 
+                                disabled={selectedAnswer === null}
+                            >
+                                {currentQuestion < quiz.questions.length - 1 ? (
+                                    <>
+                                        Next Question <ArrowRight className="w-4 h-4 ml-2" />
+                                    </>
+                                ) : (
+                                    <>
+                                        <Trophy className="w-4 h-4 mr-2" />
+                                        Submit Quiz
+                                    </>
+                                )}
                             </Button>
                         </CardContent>
                     </Card>

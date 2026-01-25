@@ -195,8 +195,13 @@ export default function DashboardPage() {
     console.log("Delete account clicked");
   };
 
+  // Determine the correct route for Continue Learning
+  const continueLearningRoute = multipleRoadmaps 
+    ? "/roadmaps" 
+    : (populatedFirst?._id ? `/roadmap/${populatedFirst._id}` : "/roadmaps");
+
   const quickActions = [
-    { title: "Continue Learning", description: multipleRoadmaps ? "Choose from your saved roadmaps" : "Resume your current roadmap", icon: BookOpen, action: multipleRoadmaps ? "/roadmaps" : "/roadmap", variant: "default", onClick: null },
+    { title: "Continue Learning", description: multipleRoadmaps ? "Choose from your saved roadmaps" : "Resume your current roadmap", icon: BookOpen, action: continueLearningRoute, variant: "default", onClick: null },
     { title: "Create New Roadmap", description: "Start learning a new skill", icon: Plus, action: "/query-form?new=1", variant: "secondary", onClick: null },
     { title: "View Analytics", description: "Track your progress", icon: BarChart3, action: "/progress", variant: "outline", onClick: null },
     { title: "Logout", description: "Sign out of your account", icon: LogOut, action: "#", variant: "outline", onClick: handleLogout },
@@ -211,7 +216,7 @@ export default function DashboardPage() {
           <div className="mb-6 sm:mb-8 md:mb-12">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
               <div className="achievement-badge p-2 sm:p-3 shrink-0">
-                <User className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+                <User className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white icon-pulse" />
               </div>
               <div className="min-w-0 flex-1">
                 <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold break-words">
@@ -238,7 +243,7 @@ export default function DashboardPage() {
                       )}
                     </div>
                     <div className={`achievement-badge p-2 sm:p-3 shrink-0 ${stat.color}`}>
-                      <stat.icon className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                      <stat.icon className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 icon-pulse" />
                     </div>
                   </CardContent>
                 </Card>
@@ -263,7 +268,7 @@ export default function DashboardPage() {
                     <span className="font-medium">Overall Progress</span>
                     <span className="text-muted-foreground">{currentRoadmap.progress}%</span>
                   </div>
-                  <Progress value={currentRoadmap.progress} className="h-2 sm:h-3" />
+                  <Progress value={currentRoadmap.progress} className="h-2 sm:h-3 progress-fun" />
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div className="p-3 sm:p-4 rounded-lg bg-primary/5 border border-primary/20">
                       <p className="text-xs sm:text-sm text-muted-foreground mb-1">Currently Learning</p>

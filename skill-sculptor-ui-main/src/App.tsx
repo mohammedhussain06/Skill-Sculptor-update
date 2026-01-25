@@ -14,6 +14,7 @@ import DashboardPage from '@/pages/DashboardPage';
 import QueryFormPage from '@/pages/QueryFormPage';
 import FlashcardsPage from '@/pages/FlashcardsPage';
 import QuizListPage from '@/pages/QuizListPage';
+import QuizTakePage from '@/pages/QuizTakePage';
 import AnalyticsPage from '@/pages/AnalyticsPage';
 import RoadmapPage from '@/pages/RoadmapPage';
 import RoadmapListPage from '@/pages/RoadmapListPage';
@@ -91,6 +92,14 @@ function App() {
                       element={
                         <ProtectedRoute>
                         <QuizListPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/quiz/:id/take"
+                      element={
+                        <ProtectedRoute>
+                        <QuizTakePage />
                         </ProtectedRoute>
                       }
                     />

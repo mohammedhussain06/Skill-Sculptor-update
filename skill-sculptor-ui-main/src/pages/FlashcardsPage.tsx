@@ -77,7 +77,10 @@ const FlashcardsPage = () => {
         return (
             <div className="min-h-screen bg-background">
                 <div className="flex items-center justify-center h-screen">
-                    <p>Loading flashcards...</p>
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                        <p className="text-muted-foreground">Loading flashcards...</p>
+                    </div>
                 </div>
             </div>
         );
@@ -86,14 +89,21 @@ const FlashcardsPage = () => {
     if (flashcards.length === 0) {
         return (
             <div className="min-h-screen bg-background">
-                <div className="container mx-auto px-4 py-8">
-                    <div className="max-w-2xl mx-auto text-center space-y-4">
-                        <Brain className="w-16 h-16 mx-auto text-muted-foreground" />
-                        <h2 className="text-2xl font-bold">No Flashcards Yet</h2>
-                        <p className="text-muted-foreground">
-                            Upload a document to generate flashcards automatically
+                <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+                    <div className="max-w-2xl mx-auto text-center space-y-4 sm:space-y-6">
+                        <div className="achievement-badge w-16 h-16 sm:w-20 sm:h-20 mx-auto flex items-center justify-center">
+                            <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                        </div>
+                        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold gradient-text">No Flashcards Yet</h2>
+                        <p className="text-sm sm:text-base text-muted-foreground">
+                            Upload a document to generate flashcards automatically 🚀
                         </p>
-                        <Button onClick={() => navigate("/upload")}>Upload Document</Button>
+                        <Button 
+                            onClick={() => navigate("/upload")}
+                            className="bg-gradient-primary hover:opacity-90 border-0 text-sm sm:text-base"
+                        >
+                            Upload Document
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -107,19 +117,24 @@ const FlashcardsPage = () => {
             <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
                 <div className="max-w-2xl mx-auto">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Flashcards</h1>
-                        <Badge variant="outline" className="text-xs sm:text-sm">
+                        <div className="flex items-center gap-3">
+                            <div className="achievement-badge p-2 sm:p-3">
+                                <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                            </div>
+                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold gradient-text">Flashcards</h1>
+                        </div>
+                        <Badge variant="outline" className="text-xs sm:text-sm bg-gradient-primary text-white border-0">
                             {currentIndex + 1} / {flashcards.length}
                         </Badge>
                     </div>
 
-                    <Card className="mb-4 sm:mb-6 min-h-[300px] sm:min-h-[350px] md:min-h-[400px] flex flex-col justify-center">
+                    <Card className="fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm mb-4 sm:mb-6 min-h-[300px] sm:min-h-[350px] md:min-h-[400px] flex flex-col justify-center transition-all duration-300">
                         <CardHeader className="p-4 sm:p-6">
                             <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
                                 <CardTitle className="text-base sm:text-lg md:text-xl break-words flex-1">{currentCard.title}</CardTitle>
                                 <div className="flex gap-2 shrink-0">
-                                    <Badge className="text-xs">{currentCard.difficulty}</Badge>
-                                    <Button variant="ghost" size="sm" onClick={deleteFlashcard} className="p-2">
+                                    <Badge className="text-xs bg-gradient-primary text-white">{currentCard.difficulty}</Badge>
+                                    <Button variant="ghost" size="sm" onClick={deleteFlashcard} className="p-2 hover:bg-destructive/10">
                                         <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                                     </Button>
                                 </div>
@@ -144,15 +159,18 @@ const FlashcardsPage = () => {
                     </Card>
 
                     {showAnswer && (
-                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4 sm:mb-6">
+                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4 sm:mb-6 animate-fadeInUp">
                             <Button
                                 variant="outline"
-                                className="flex-1 text-sm sm:text-base"
+                                className="flex-1 text-sm sm:text-base hover:bg-destructive/10 hover:border-destructive"
                                 onClick={() => handleReview(false)}
                             >
                                 ❌ Wrong
                             </Button>
-                            <Button className="flex-1 text-sm sm:text-base" onClick={() => handleReview(true)}>
+                            <Button 
+                                className="flex-1 text-sm sm:text-base bg-gradient-primary hover:opacity-90 border-0" 
+                                onClick={() => handleReview(true)}
+                            >
                                 ✅ Correct
                             </Button>
                         </div>

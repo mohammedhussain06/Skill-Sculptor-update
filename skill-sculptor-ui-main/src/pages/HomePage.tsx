@@ -118,8 +118,8 @@ export default function HomePage() {
           {/* Abstract gradient shapes - flowing arrows and circles */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-secondary/20"></div>
           <div className="absolute bottom-0 left-0 w-full h-full">
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl floating-bg"></div>
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl floating-bg-delayed"></div>
           </div>
         </div>
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 md:py-32 text-center">
@@ -160,7 +160,7 @@ export default function HomePage() {
               <Card key={index} className="fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm">
                 <CardHeader className="text-center p-4 sm:p-6">
                   <div className="achievement-badge w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-3 sm:mb-4 flex items-center justify-center">
-                    <feature.icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" />
+                    <feature.icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white icon-pulse" />
                   </div>
                   <CardTitle className="text-base sm:text-lg md:text-xl break-words">{feature.title}</CardTitle>
                 </CardHeader>
@@ -190,8 +190,8 @@ export default function HomePage() {
             {studentFeatures.map((feature, index) => (
               <Card key={index} className="fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm">
                 <CardHeader className="text-center pb-3 sm:pb-4 p-4 sm:p-6">
-                  <div className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 rounded-full ${feature.color} flex items-center justify-center shadow-lg`}>
-                    <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 rounded-full ${feature.color} flex items-center justify-center shadow-lg constant-glow`}>
+                    <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white icon-pulse" />
                   </div>
                   <CardTitle className="text-sm sm:text-base md:text-lg break-words">{feature.title}</CardTitle>
                 </CardHeader>
@@ -225,8 +225,8 @@ export default function HomePage() {
               >
                 <CardHeader className="p-4 sm:p-6 pb-3 sm:pb-4">
                   <div className="flex items-center justify-between mb-3 sm:mb-4">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-primary flex items-center justify-center shadow-lg">
-                      <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-primary flex items-center justify-center shadow-lg constant-glow">
+                      <tool.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white icon-pulse" />
                     </div>
                     <span className="text-[10px] sm:text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full">
                       {tool.badge}
@@ -260,8 +260,8 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
             <div className="flex items-center space-x-2">
-              <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-primary">
-                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white" />
+              <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-primary constant-glow">
+                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white sparkle" />
               </div>
               <span className="text-base sm:text-lg md:text-xl font-bold gradient-text">SkillSculptor</span>
             </div>
