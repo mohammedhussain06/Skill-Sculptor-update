@@ -1,0 +1,443 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SkillSculptor Design System - Professional Learning Platform
+All colors MUST be HSL. Modern, clean, professional SaaS design.
+*/
+
+@layer base {
+  :root {
+    /* Background System */
+    --background: 0 0% 100%;
+    --background-secondary: 240 10% 98%;
+    --background-gradient: linear-gradient(135deg, hsl(240 10% 98%) 0%, hsl(0 0% 100%) 100%);
+    --foreground: 210 11% 15%;
+
+    /* Card System */
+    --card: 0 0% 100%;
+    --card-foreground: 210 11% 15%;
+    --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --card-hover: 0 8px 25px -8px rgb(0 0 0 / 0.1);
+
+    /* Primary Blue System */
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 217 91% 55%;
+    --primary-muted: 217 91% 95%;
+
+    /* Secondary Purple System */
+    --secondary: 258 90% 66%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 258 90% 60%;
+    --secondary-muted: 258 90% 95%;
+
+    /* Professional Grays */
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --muted-darker: 240 5% 84%;
+
+    /* Accent & Status Colors */
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 98%;
+
+    /* Border & Input System */
+    --border: 240 6% 92%;
+    --border-focus: 217 91% 60%;
+    --input: 240 6% 92%;
+    --input-focus: 217 91% 60%;
+    --ring: 217 91% 60%;
+
+    /* Interactive Elements */
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 11% 15%;
+    
+    /* Design System Extensions */
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(258 90% 66%) 100%);
+    --gradient-subtle: linear-gradient(135deg, hsl(240 10% 98%) 0%, hsl(217 91% 98%) 50%, hsl(258 90% 98%) 100%);
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-glow: 0 0 20px hsl(217 91% 60% / 0.3);
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Dark mode optimized for SkillSculptor */
+    --background: 210 11% 8%;
+    --background-secondary: 210 11% 11%;
+    --background-gradient: linear-gradient(135deg, hsl(210 11% 8%) 0%, hsl(210 11% 11%) 100%);
+    --foreground: 210 11% 98%;
+
+    --card: 210 11% 11%;
+    --card-foreground: 210 11% 98%;
+    --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+    --card-hover: 0 8px 25px -8px rgb(0 0 0 / 0.3);
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 217 91% 65%;
+    --primary-muted: 217 91% 15%;
+
+    --secondary: 258 90% 66%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 258 90% 70%;
+    --secondary-muted: 258 90% 15%;
+
+    --muted: 210 11% 15%;
+    --muted-foreground: 210 11% 65%;
+    --muted-darker: 210 11% 20%;
+
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 210 11% 20%;
+    --border-focus: 217 91% 60%;
+    --input: 210 11% 15%;
+    --input-focus: 217 91% 60%;
+    --ring: 217 91% 60%;
+
+    --popover: 210 11% 11%;
+    --popover-foreground: 210 11% 98%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(258 90% 66%) 100%);
+    --gradient-subtle: linear-gradient(135deg, hsl(210 11% 8%) 0%, hsl(217 91% 12%) 50%, hsl(258 90% 12%) 100%);
+    --shadow-glow: 0 0 20px hsl(217 91% 60% / 0.5);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-inter antialiased;
+    background: var(--background-gradient);
+    min-height: 100vh;
+  }
+
+  /* Professional typography scale - fully responsive */
+  h1 { 
+    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight; 
+  }
+  h2 { 
+    @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight; 
+  }
+  h3 { 
+    @apply text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold tracking-tight; 
+  }
+  h4 { 
+    @apply text-base sm:text-lg md:text-xl font-medium; 
+  }
+  h5 { 
+    @apply text-sm sm:text-base md:text-lg font-medium; 
+  }
+  h6 { 
+    @apply text-xs sm:text-sm md:text-base font-medium; 
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground));
+    border-radius: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary));
+  }
+}
+
+@layer components {
+  /* Student-friendly gradient text effect */
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradient-shift 3s ease-in-out infinite;
+  }
+  
+  @keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  /* Fun card hover effects with bounce */
+  .card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .card-hover:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: var(--card-hover), 0 0 20px hsl(var(--primary) / 0.1);
+  }
+  
+  /* Student-friendly focus rings with glow */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .focus-ring:focus {
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+  }
+  
+  /* Animated timeline connector */
+  .timeline-connector {
+    position: relative;
+  }
+  
+  .timeline-connector::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+    transform: translateX(-50%);
+    border-radius: 2px;
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+  
+  /* Enhanced link cards with student-friendly animations */
+  .resource-link-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  
+  .resource-link-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.1), transparent);
+    transition: left 0.6s ease;
+  }
+  
+  .resource-link-card:hover::before {
+    left: 100%;
+  }
+  
+  .resource-link-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px hsl(var(--primary) / 0.15);
+  }
+  
+  /* Fun glow effect for interactive elements */
+  .interactive-glow {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+  }
+  
+  .interactive-glow:hover {
+    box-shadow: 0 0 0 2px hsl(var(--primary) / 0.3), 0 6px 20px hsl(var(--primary) / 0.15);
+    transform: translateY(-1px);
+  }
+  
+  /* Animated resource completion progress bar */
+  .resource-progress-bar {
+    background: linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .resource-progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+  
+  /* Fun resource completion checkbox */
+  .resource-checkbox {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+  }
+  
+  .resource-checkbox:hover {
+    transform: scale(1.15) rotate(5deg);
+    box-shadow: 0 4px 12px hsl(var(--primary) / 0.3);
+  }
+  
+  .resource-checkbox:active {
+    transform: scale(0.9);
+  }
+  
+  /* Student-friendly button animations */
+  .btn-student {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .btn-student::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  
+  .btn-student:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .btn-student:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px hsl(var(--primary) / 0.3);
+  }
+  
+  /* Fun loading animations */
+  .loading-bounce {
+    animation: bounce 1s infinite;
+  }
+  
+  @keyframes bounce {
+    0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
+    40%, 43% { transform: translate3d(0, -8px, 0); }
+    70% { transform: translate3d(0, -4px, 0); }
+    90% { transform: translate3d(0, -2px, 0); }
+  }
+  
+  /* Student achievement badges */
+  .achievement-badge {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+    border-radius: 50%;
+    padding: 8px;
+    box-shadow: 0 4px 12px hsl(var(--primary) / 0.3);
+    animation: achievement-pulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes achievement-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  
+  /* Responsive text sizing - enhanced */
+  .text-responsive {
+    @apply text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl;
+    line-height: 1.6;
+  }
+  
+  .heading-responsive {
+    @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl;
+    line-height: 1.2;
+  }
+  
+  /* Mobile-first spacing */
+  .spacing-responsive {
+    @apply p-3 sm:p-4 md:p-6 lg:p-8 xl:p-12;
+  }
+  
+  /* Responsive container padding */
+  .container-responsive {
+    @apply px-4 sm:px-6 md:px-8 lg:px-12;
+  }
+  
+  /* Responsive gap utilities */
+  .gap-responsive {
+    @apply gap-3 sm:gap-4 md:gap-6 lg:gap-8;
+  }
+  
+  /* Responsive grid columns */
+  .grid-responsive {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+  }
+  
+  /* Fun hover effects for cards */
+  .fun-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 16px;
+  }
+  
+  .fun-card:hover {
+    transform: translateY(-4px) rotate(1deg);
+    box-shadow: 0 12px 30px hsl(var(--primary) / 0.2);
+  }
+  
+  /* Student progress indicators */
+  .progress-fun {
+    background: linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .progress-fun::before {
+    content: '🎯';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    animation: wiggle 1s ease-in-out infinite;
+  }
+  
+  @keyframes wiggle {
+    0%, 100% { transform: translateY(-50%) rotate(0deg); }
+    25% { transform: translateY(-50%) rotate(5deg); }
+    75% { transform: translateY(-50%) rotate(-5deg); }
+  }
+}

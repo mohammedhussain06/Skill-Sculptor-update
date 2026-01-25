@@ -1,0 +1,57 @@
+# ==========================================================
+# Skill-Sculptor Project .gitignore
+# Covers both: skill-sculptor-ui-main (frontend) + backend
+# ==========================================================
+
+# -------------------------
+# Node.js (frontend + backend)
+# -------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# -------------------------
+# Environment / Secrets
+# -------------------------
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# -------------------------
+# Build / Output
+# -------------------------
+dist/
+build/
+out/
+
+# -------------------------
+# Logs
+# -------------------------
+*.log
+logs/
+debug.log
+
+# -------------------------
+# VSCode / IDEs
+# -------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -------------------------
+# OS generated files
+# -------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# Miscellaneous
+# -------------------------
+*.cache
+*.tmp
+*.pid
