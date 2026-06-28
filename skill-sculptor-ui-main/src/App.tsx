@@ -23,6 +23,8 @@ import FlashcardGeneratePage from '@/pages/FlashcardGeneratePage';
 import QuizGeneratePage from '@/pages/QuizGeneratePage';
 import UploadPage from '@/pages/UploadPage';
 import { ThreeBackground } from '@/components/effects/ThreeBackground';
+import { FocusWidget } from '@/components/FocusWidget';
+
 
 const queryClient = new QueryClient();
 
@@ -143,6 +145,7 @@ function App() {
                   </Routes>
                 <AuthModal />
                 <Toaster />
+                <FocusWidget />
               </div>
             </AuthProvider>
           </TooltipProvider>
