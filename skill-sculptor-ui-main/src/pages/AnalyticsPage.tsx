@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, TrendingUp, Target, Award, Clock, BookOpen, Calendar, BarChart3 } from 'lucide-react';
 import API from '../../api/axios';
+import { AnimatedCounter } from '@/components/effects/AnimatedCounter';
+import { cn } from '@/lib/utils';
 
 export default function AnalyticsPage() {
   const [analytics, setAnalytics] = useState<any>(null);
@@ -141,12 +143,30 @@ export default function AnalyticsPage() {
     fetchAnalytics();
   }, [navigate]);
 
+  // Anime.js entry stagger animation
+  useEffect(() => {
+    if (loading || !analytics) return;
+    (async () => {
+      try {
+        const anime = (await import('animejs')).default;
+        anime({
+          targets: '.progress-stagger-item',
+          translateY: [20, 0],
+          opacity: [0, 1],
+          delay: anime.stagger(80, { start: 100 }),
+          duration: 700,
+          easing: 'easeOutExpo',
+        });
+      } catch { /* skip */ }
+    })();
+  }, [loading, analytics]);
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading analytics...</p>
+      <div className="min-h-screen bg-background/50 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary border-t-transparent mx-auto"></div>
+          <p className="text-muted-foreground text-sm font-medium">Loading statistics...</p>
         </div>
       </div>
     );
@@ -154,7 +174,7 @@ export default function AnalyticsPage() {
 
   if (!analytics) {
     return (
-      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+      <div className="min-h-screen bg-background/50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-muted-foreground">No analytics data available.</p>
           <Button onClick={() => navigate('/dashboard')} className="mt-4">
@@ -171,7 +191,7 @@ export default function AnalyticsPage() {
       value: analytics.currentStreak, 
       unit: "days", 
       icon: TrendingUp, 
-      color: "text-success",
+      color: "text-orange-400",
       description: "Consecutive days of learning"
     },
     { 
@@ -179,7 +199,7 @@ export default function AnalyticsPage() {
       value: analytics.totalRoadmaps, 
       unit: "active", 
       icon: Target, 
-      color: "text-primary",
+      color: "text-indigo-400",
       description: "Different skills in progress"
     },
     { 
@@ -187,7 +207,7 @@ export default function AnalyticsPage() {
       value: analytics.completedSteps, 
       unit: "total", 
       icon: Award, 
-      color: "text-secondary",
+      color: "text-emerald-400",
       description: "Learning milestones achieved"
     },
     { 
@@ -195,55 +215,57 @@ export default function AnalyticsPage() {
       value: analytics.completionRate, 
       unit: "%", 
       icon: BarChart3, 
-      color: "text-accent",
+      color: "text-cyan-400",
       description: "Overall progress percentage"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      <div className="py-6 sm:py-8 md:py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-subtle relative overflow-hidden">
+      <div className="py-6 sm:py-8 md:py-12 px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-6 sm:mb-8">
+          <div className="mb-6 sm:mb-8 progress-stagger-item animate-fadeInUp" style={{ opacity: 0 }}>
             <Button 
               variant="outline" 
               onClick={() => navigate('/dashboard')} 
-              className="flex items-center space-x-2 mb-4 sm:mb-6 text-sm sm:text-base w-full sm:w-auto"
+              className="flex items-center space-x-2 mb-4 sm:mb-6 text-sm border-white/10 hover:bg-white/10 w-full sm:w-auto font-semibold"
             >
-              <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+              <ArrowLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Back to Dashboard</span>
               <span className="sm:hidden">Back</span>
             </Button>
             
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-              <div className="p-2 sm:p-3 rounded-full bg-gradient-primary shadow-glow shrink-0">
-                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+              <div className="p-2.5 rounded-xl bg-gradient-primary shrink-0">
+                <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div className="min-w-0 flex-1">
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold break-words">Learning Analytics</h1>
-                <p className="text-muted-foreground text-sm sm:text-base md:text-lg mt-1">Track your progress and learning patterns</p>
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>Learning Analytics</h1>
+                <p className="text-muted-foreground text-xs sm:text-sm md:text-base mt-1.5 font-medium">Track your progress and learning patterns</p>
               </div>
             </div>
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8">
             {stats.map((stat, i) => (
-              <Card key={i} className="border-0 shadow-card bg-card/80 backdrop-blur-sm hover:shadow-lg transition-shadow duration-200">
-                <CardContent className="p-4 sm:p-5 md:p-6">
-                  <div className="flex items-center justify-between mb-3 sm:mb-4">
-                    <div className={`p-1.5 sm:p-2 rounded-lg bg-muted/20 shrink-0 ${stat.color}`}>
-                      <stat.icon className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </div>
-                    <div className="text-right min-w-0 ml-2">
-                      <p className="text-xl sm:text-2xl font-bold break-words">{stat.value}</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">{stat.unit}</p>
-                    </div>
+              <Card key={i} className="glass-card border-0 bg-card/40 backdrop-blur-xl border-white/5 progress-stagger-item shadow-xl" style={{ opacity: 0 }}>
+                <CardContent className="p-5 flex items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">{stat.label}</p>
+                    <p className="text-xs text-muted-foreground mt-1.5 break-words line-clamp-1 font-medium">{stat.description}</p>
                   </div>
-                  <div>
-                    <p className="font-medium text-xs sm:text-sm break-words">{stat.label}</p>
-                    <p className="text-xs text-muted-foreground mt-1 break-words line-clamp-2">{stat.description}</p>
+                  <div className="text-right shrink-0 flex items-center gap-3">
+                    <div className="text-right">
+                      <p className="text-xl sm:text-2xl font-extrabold break-words tracking-tight text-foreground" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                        <AnimatedCounter value={stat.value} duration={1200} />
+                      </p>
+                      <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider mt-0.5">{stat.unit}</p>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
+                      <stat.icon className={cn("w-4.5 h-4.5", stat.color)} />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -253,7 +275,7 @@ export default function AnalyticsPage() {
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8">
             {/* Weekly Progress Chart */}
-            <Card className="border-0 shadow-card bg-card/80 backdrop-blur-sm">
+            <Card className="glass-card border-0 bg-card/40 backdrop-blur-xl border-white/5 progress-stagger-item shadow-xl" style={{ opacity: 0 }}>
               <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="text-base sm:text-lg md:text-xl flex items-center space-x-2">
                   <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0" />
@@ -270,7 +292,7 @@ export default function AnalyticsPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2">
-                          <div className="flex-1 bg-muted/20 rounded-full h-2 min-w-0">
+                          <div className="flex-1 bg-white/5 border border-white/10 rounded-full h-2 min-w-0">
                             <div 
                               className="bg-gradient-primary h-2 rounded-full transition-all duration-300"
                               style={{ width: `${Math.min((day.steps / Math.max(...analytics.weeklyProgress.map(d => d.steps)) || 1) * 100, 100)}%` }}
@@ -284,8 +306,8 @@ export default function AnalyticsPage() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border">
-                  <p className="text-xs sm:text-sm text-muted-foreground">
+                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-white/10">
+                  <p className="text-xs sm:text-sm text-muted-foreground font-semibold">
                     Total this week: {analytics.weeklyProgress.reduce((acc, day) => acc + day.steps, 0)} steps completed
                   </p>
                 </div>
@@ -293,7 +315,7 @@ export default function AnalyticsPage() {
             </Card>
 
             {/* Skill Distribution */}
-            <Card className="border-0 shadow-card bg-card/80 backdrop-blur-sm">
+            <Card className="glass-card border-0 bg-card/40 backdrop-blur-xl border-white/5 progress-stagger-item shadow-xl" style={{ opacity: 0 }}>
               <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="text-base sm:text-lg md:text-xl flex items-center space-x-2">
                   <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-secondary shrink-0" />
@@ -307,11 +329,11 @@ export default function AnalyticsPage() {
                     <div key={i} className="space-y-2">
                       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-2">
                         <span className="font-medium text-xs sm:text-sm break-words">{skill.skill}</span>
-                        <span className="text-xs sm:text-sm text-muted-foreground shrink-0">
+                        <span className="text-xs sm:text-sm text-muted-foreground shrink-0 font-semibold">
                           {skill.completed}/{skill.total} ({skill.progress}%)
                         </span>
                       </div>
-                      <Progress value={skill.progress} className="h-1.5 sm:h-2" />
+                      <Progress value={skill.progress} className="h-1.5 sm:h-2 progress-fun" />
                     </div>
                   ))}
                 </div>
@@ -326,10 +348,10 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Learning Insights */}
-          <Card className="border-0 shadow-card bg-card/80 backdrop-blur-sm">
+          <Card className="glass-card border-0 bg-card/40 backdrop-blur-xl border-white/5 progress-stagger-item shadow-xl" style={{ opacity: 0 }}>
             <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="text-base sm:text-lg md:text-xl flex items-center space-x-2">
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-accent shrink-0" />
+              <CardTitle className="text-base sm:text-lg md:text-xl flex items-center space-x-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                <TrendingUp className="w-5 h-5 text-primary shrink-0" />
                 <span>Learning Insights</span>
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">Personalized insights based on your learning patterns</CardDescription>
@@ -337,9 +359,9 @@ export default function AnalyticsPage() {
             <CardContent className="p-4 sm:p-6 pt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-3 sm:space-y-4">
-                  <div className="p-3 sm:p-4 rounded-lg bg-primary/5 border border-primary/20">
-                    <h4 className="font-medium text-primary mb-1.5 sm:mb-2 text-sm sm:text-base">Current Streak</h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground break-words">
+                  <div className="p-3.5 sm:p-4 rounded-xl bg-primary/5 border border-primary/20">
+                    <h4 className="font-bold text-primary mb-1.5 sm:mb-2 text-sm sm:text-base">Current Streak</h4>
+                    <p className="text-xs sm:text-sm text-muted-foreground break-words font-medium">
                       {analytics.currentStreak > 0 
                         ? `You've been learning for ${analytics.currentStreak} consecutive days! Keep up the great work! 🔥`
                         : "Start a learning streak by completing your first step today!"
@@ -347,9 +369,9 @@ export default function AnalyticsPage() {
                     </p>
                   </div>
                   
-                  <div className="p-3 sm:p-4 rounded-lg bg-secondary/5 border border-secondary/20">
-                    <h4 className="font-medium text-secondary mb-1.5 sm:mb-2 text-sm sm:text-base">Learning Efficiency</h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground break-words">
+                  <div className="p-3.5 sm:p-4 rounded-xl bg-white/5 border border-white/10">
+                    <h4 className="font-bold text-foreground/80 mb-1.5 sm:mb-2 text-sm sm:text-base">Learning Efficiency</h4>
+                    <p className="text-xs sm:text-sm text-muted-foreground break-words font-medium">
                       {analytics.averageTimePerStep > 0 
                         ? `You complete steps in an average of ${analytics.averageTimePerStep} days. Great pace!`
                         : "Complete more steps to see your learning efficiency metrics."
@@ -359,9 +381,9 @@ export default function AnalyticsPage() {
                 </div>
                 
                 <div className="space-y-3 sm:space-y-4">
-                  <div className="p-3 sm:p-4 rounded-lg bg-success/5 border border-success/20">
-                    <h4 className="font-medium text-success mb-1.5 sm:mb-2 text-sm sm:text-base">Progress Summary</h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground break-words">
+                  <div className="p-3.5 sm:p-4 rounded-xl bg-success/5 border border-success/20">
+                    <h4 className="font-bold text-success mb-1.5 sm:mb-2 text-sm sm:text-base">Progress Summary</h4>
+                    <p className="text-xs sm:text-sm text-muted-foreground break-words font-medium">
                       You've completed {analytics.completedSteps} out of {analytics.totalSteps} total steps 
                       ({analytics.completionRate}% completion rate). 
                       {analytics.completionRate > 50 
@@ -373,9 +395,9 @@ export default function AnalyticsPage() {
                     </p>
                   </div>
                   
-                  <div className="p-3 sm:p-4 rounded-lg bg-accent/5 border border-accent/20">
-                    <h4 className="font-medium text-accent mb-1.5 sm:mb-2 text-sm sm:text-base">Recommendations</h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground break-words">
+                  <div className="p-3.5 sm:p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
+                    <h4 className="font-bold text-amber-500 mb-1.5 sm:mb-2 text-sm sm:text-base">Recommendations</h4>
+                    <p className="text-xs sm:text-sm text-muted-foreground break-words font-medium">
                       {analytics.currentStreak === 0 
                         ? "Try to maintain a daily learning routine to build momentum."
                         : analytics.completionRate < 30

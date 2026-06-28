@@ -2,132 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
-/* SkillSculptor Design System - Professional Learning Platform
-All colors MUST be HSL. Modern, clean, professional SaaS design.
+/*
+  SkillSculptor — "Quiet Study" Focus Theme
+  Clean, warm, cozy, distraction-free online study vibes.
+  A soft slate/indigo/teal palette with smooth, gentle animations.
 */
 
 @layer base {
   :root {
-    /* Background System */
-    --background: 0 0% 100%;
-    --background-secondary: 240 10% 98%;
-    --background-gradient: linear-gradient(135deg, hsl(240 10% 98%) 0%, hsl(0 0% 100%) 100%);
-    --foreground: 210 11% 15%;
+    /* === QUIET ACADEMIA DARK FOCUS PALETTE === */
+    --background: 222 47% 10%; /* Deep slate navy */
+    --background-secondary: 222 40% 12%;
+    --background-gradient: linear-gradient(180deg, hsl(222 47% 10%) 0%, hsl(224 45% 8%) 100%);
+    --foreground: 215 20% 90%;
 
-    /* Card System */
-    --card: 0 0% 100%;
-    --card-foreground: 210 11% 15%;
-    --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --card-hover: 0 8px 25px -8px rgb(0 0 0 / 0.1);
+    /* Calm Cards - clean and flat-ish with light borders */
+    --card: 222 40% 13%;
+    --card-foreground: 215 20% 90%;
+    --card-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    --card-hover: 0 8px 30px rgba(0,0,0,0.4);
 
-    /* Primary Blue System */
-    --primary: 217 91% 60%;
+    /* === PRIMARY — Focused Soft Indigo === */
+    --primary: 238 85% 68%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 217 91% 55%;
-    --primary-muted: 217 91% 95%;
+    --primary-hover: 238 85% 72%;
+    --primary-muted: 238 85% 15%;
 
-    /* Secondary Purple System */
-    --secondary: 258 90% 66%;
-    --secondary-foreground: 0 0% 100%;
-    --secondary-hover: 258 90% 60%;
-    --secondary-muted: 258 90% 95%;
+    /* === SECONDARY — Warm Calm Sage/Teal === */
+    --secondary: 172 70% 48%;
+    --secondary-foreground: 222 47% 10%;
+    --secondary-hover: 172 70% 54%;
+    --secondary-muted: 172 70% 10%;
 
-    /* Professional Grays */
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
-    --muted-darker: 240 5% 84%;
+    /* === ACCENT — Soft Gold/Warm Amber === */
+    --accent: 38 80% 55%;
+    --accent-foreground: 222 47% 10%;
 
-    /* Accent & Status Colors */
-    --accent: 217 91% 60%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
+    /* Semantic colors */
+    --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 98%;
-    --success: 142 76% 36%;
+    --success: 150 60% 45%;
     --success-foreground: 0 0% 98%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 98%;
+    --warning: 38 80% 55%;
+    --warning-foreground: 222 47% 10%;
 
-    /* Border & Input System */
-    --border: 240 6% 92%;
-    --border-focus: 217 91% 60%;
-    --input: 240 6% 92%;
-    --input-focus: 217 91% 60%;
-    --ring: 217 91% 60%;
+    /* Muted Grays */
+    --muted: 222 25% 18%;
+    --muted-foreground: 215 15% 65%;
+    --muted-darker: 222 25% 22%;
 
-    /* Interactive Elements */
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 11% 15%;
-    
-    /* Design System Extensions */
-    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(258 90% 66%) 100%);
-    --gradient-subtle: linear-gradient(135deg, hsl(240 10% 98%) 0%, hsl(217 91% 98%) 50%, hsl(258 90% 98%) 100%);
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --shadow-glow: 0 0 20px hsl(217 91% 60% / 0.3);
+    /* Borders & Inputs */
+    --border: 222 25% 20%;
+    --border-focus: 238 85% 68%;
+    --input: 222 25% 16%;
+    --input-focus: 238 85% 68%;
+    --ring: 238 85% 68%;
+
+    --popover: 222 40% 13%;
+    --popover-foreground: 215 20% 90%;
+
+    /* Gentle gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(238 85% 68%) 0%, hsl(172 70% 48%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(222 47% 10%) 0%, hsl(224 45% 8%) 100%);
 
     --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 222 40% 13%;
+    --sidebar-foreground: 215 20% 90%;
+    --sidebar-primary: 238 85% 68%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 25% 18%;
+    --sidebar-accent-foreground: 215 20% 90%;
+    --sidebar-border: 222 25% 20%;
+    --sidebar-ring: 238 85% 68%;
   }
 
-  .dark {
-    /* Dark mode optimized for SkillSculptor */
-    --background: 210 11% 8%;
-    --background-secondary: 210 11% 11%;
-    --background-gradient: linear-gradient(135deg, hsl(210 11% 8%) 0%, hsl(210 11% 11%) 100%);
-    --foreground: 210 11% 98%;
+  /* Light focus mode */
+  .light {
+    --background: 210 30% 98%;
+    --background-secondary: 210 20% 95%;
+    --background-gradient: linear-gradient(180deg, hsl(210 30% 98%) 0%, hsl(210 20% 95%) 100%);
+    --foreground: 222 47% 15%;
 
-    --card: 210 11% 11%;
-    --card-foreground: 210 11% 98%;
-    --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-    --card-hover: 0 8px 25px -8px rgb(0 0 0 / 0.3);
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 15%;
+    --card-shadow: 0 4px 18px rgba(0,0,0,0.04);
+    --card-hover: 0 8px 24px rgba(0,0,0,0.08);
 
-    --primary: 217 91% 60%;
+    --primary: 238 75% 58%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 217 91% 65%;
-    --primary-muted: 217 91% 15%;
+    --primary-hover: 238 75% 53%;
+    --primary-muted: 238 75% 95%;
 
-    --secondary: 258 90% 66%;
+    --secondary: 172 60% 40%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-hover: 258 90% 70%;
-    --secondary-muted: 258 90% 15%;
+    --secondary-hover: 172 60% 35%;
+    --secondary-muted: 172 60% 95%;
 
-    --muted: 210 11% 15%;
-    --muted-foreground: 210 11% 65%;
-    --muted-darker: 210 11% 20%;
+    --muted: 210 20% 92%;
+    --muted-foreground: 210 10% 45%;
+    --muted-darker: 210 20% 86%;
 
-    --accent: 217 91% 60%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --border: 210 20% 88%;
+    --input: 210 20% 92%;
+    --ring: 238 75% 58%;
 
-    --border: 210 11% 20%;
-    --border-focus: 217 91% 60%;
-    --input: 210 11% 15%;
-    --input-focus: 217 91% 60%;
-    --ring: 217 91% 60%;
-
-    --popover: 210 11% 11%;
-    --popover-foreground: 210 11% 98%;
-
-    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(258 90% 66%) 100%);
-    --gradient-subtle: linear-gradient(135deg, hsl(210 11% 8%) 0%, hsl(217 91% 12%) 50%, hsl(258 90% 12%) 100%);
-    --shadow-glow: 0 0 20px hsl(217 91% 60% / 0.5);
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 15%;
   }
 }
 
@@ -136,494 +117,183 @@ All colors MUST be HSL. Modern, clean, professional SaaS design.
     @apply border-border;
   }
 
-  body {
-    @apply bg-background text-foreground font-inter antialiased;
-    background: var(--background-gradient);
-    min-height: 100vh;
+  html {
+    scroll-behavior: smooth;
   }
 
-  /* Professional typography scale - fully responsive */
-  h1 { 
-    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight; 
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
+    background: var(--background-gradient);
+    min-height: 100vh;
+    overflow-x: hidden;
   }
-  h2 { 
-    @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight; 
+
+  h1, h2, h3 {
+    font-family: 'Outfit', 'Inter', sans-serif;
+    @apply tracking-tight;
   }
-  h3 { 
-    @apply text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold tracking-tight; 
-  }
-  h4 { 
-    @apply text-base sm:text-lg md:text-xl font-medium; 
-  }
-  h5 { 
-    @apply text-sm sm:text-base md:text-lg font-medium; 
-  }
-  h6 { 
-    @apply text-xs sm:text-sm md:text-base font-medium; 
-  }
-  
+
+  /* Responsive Typography */
+  h1 { @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold; }
+  h2 { @apply text-2xl sm:text-3xl md:text-4xl font-semibold; }
+  h3 { @apply text-xl sm:text-2xl md:text-3xl font-semibold; }
+  h4 { @apply text-base sm:text-lg md:text-xl font-medium; }
+  h5 { @apply text-sm sm:text-base md:text-lg font-medium; }
+  h6 { @apply text-xs sm:text-sm md:text-base font-medium; }
+
   /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  
-  ::-webkit-scrollbar-track {
-    background: hsl(var(--muted));
-  }
-  
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: hsl(var(--muted)); }
   ::-webkit-scrollbar-thumb {
-    background: hsl(var(--muted-foreground));
-    border-radius: 3px;
+    background: hsl(var(--primary) / 0.3);
+    border-radius: 4px;
   }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--primary));
-  }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--primary) / 0.6); }
 }
 
 @layer components {
-  /* Student-friendly gradient text effect - constant animation */
+  /* Simple, quiet gradient text */
   .gradient-text {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 50%, hsl(var(--primary)) 100%);
-    background-size: 200% 200%;
+    background: var(--gradient-primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: gradient-shift 3s ease-in-out infinite;
   }
-  
-  @keyframes gradient-shift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-  
-  /* Fun card hover effects with bounce */
-  .card-hover {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .card-hover:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: var(--card-hover), 0 0 20px hsl(var(--primary) / 0.1);
-  }
-  
-  /* Student-friendly focus rings with glow */
-  .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .focus-ring:focus {
-    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
-  }
-  
-  /* Animated timeline connector */
-  .timeline-connector {
-    position: relative;
-  }
-  
-  .timeline-connector::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: linear-gradient(180deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
-    transform: translateX(-50%);
-    border-radius: 2px;
-    animation: pulse-glow 2s ease-in-out infinite;
-  }
-  
-  @keyframes pulse-glow {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
-  }
-  
-  /* Enhanced link cards with student-friendly animations */
-  .resource-link-card {
-    position: relative;
-    overflow: hidden;
-    border-radius: 12px;
-  }
-  
-  .resource-link-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.1), transparent);
-    transition: left 0.6s ease;
-  }
-  
-  .resource-link-card:hover::before {
-    left: 100%;
-  }
-  
-  .resource-link-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px hsl(var(--primary) / 0.15);
-  }
-  
-  /* Fun glow effect for interactive elements */
-  .interactive-glow {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 12px;
-  }
-  
-  .interactive-glow:hover {
-    box-shadow: 0 0 0 2px hsl(var(--primary) / 0.3), 0 6px 20px hsl(var(--primary) / 0.15);
-    transform: translateY(-1px);
-  }
-  
-  /* Animated resource completion progress bar */
-  .resource-progress-bar {
-    background: linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
-    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 4px;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .resource-progress-bar::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    animation: shimmer 2s infinite;
-  }
-  
-  @keyframes shimmer {
-    0% { left: -100%; }
-    100% { left: 100%; }
-  }
-  
-  /* Fun resource completion checkbox */
-  .resource-checkbox {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 50%;
-  }
-  
-  .resource-checkbox:hover {
-    transform: scale(1.15) rotate(5deg);
-    box-shadow: 0 4px 12px hsl(var(--primary) / 0.3);
-  }
-  
-  .resource-checkbox:active {
-    transform: scale(0.9);
-  }
-  
-  /* Student-friendly button animations - with constant subtle pulse */
-  .btn-student {
-    position: relative;
-    overflow: hidden;
-    border-radius: 12px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    animation: btn-subtle-pulse 3s ease-in-out infinite;
-  }
-  
-  .btn-student::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-  }
-  
-  .btn-student:hover::before {
-    width: 300px;
-    height: 300px;
-  }
-  
-  .btn-student:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px hsl(var(--primary) / 0.3);
-    animation: btn-subtle-pulse 1.5s ease-in-out infinite;
-  }
-  
-  @keyframes btn-subtle-pulse {
-    0%, 100% { 
-      box-shadow: 0 4px 12px hsl(var(--primary) / 0.2);
-    }
-    50% { 
-      box-shadow: 0 4px 16px hsl(var(--primary) / 0.3);
-    }
-  }
-  
-  /* Gradient button constant animation */
-  .bg-gradient-primary {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
-    background-size: 200% 200%;
-    animation: gradient-shift 3s ease-in-out infinite;
-  }
-  
-  .bg-gradient-primary:hover {
-    animation: gradient-shift 1.5s ease-in-out infinite;
-  }
-  
-  /* Fun loading animations */
-  .loading-bounce {
-    animation: bounce 1s infinite;
-  }
-  
-  @keyframes bounce {
-    0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
-    40%, 43% { transform: translate3d(0, -8px, 0); }
-    70% { transform: translate3d(0, -4px, 0); }
-    90% { transform: translate3d(0, -2px, 0); }
-  }
-  
-  /* Student achievement badges - constant animation */
-  .achievement-badge {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
-    background-size: 200% 200%;
-    border-radius: 50%;
-    padding: 8px;
-    box-shadow: 0 4px 12px hsl(var(--primary) / 0.3);
-    animation: achievement-pulse 2s ease-in-out infinite, gradient-flow 3s ease infinite;
+
+  /* Glass Card — minimal distraction, quiet background blur */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
     transition: all 0.3s ease;
   }
-  
+
+  .glass-card:hover {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: var(--card-hover);
+  }
+
+  /* Quiet Fun Card */
+  .fun-card {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.4s ease-out both;
+  }
+
+  .fun-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: var(--card-hover);
+  }
+
+  .card-hover {
+    transition: all 0.3s ease;
+  }
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-hover);
+  }
+
+  /* Simple Gradient Button */
+  .bg-gradient-primary {
+    background: var(--gradient-primary);
+    transition: opacity 0.2s ease;
+  }
+
+  .bg-gradient-primary:hover {
+    opacity: 0.95;
+  }
+
+  /* Minimal Achievement Badge */
+  .achievement-badge {
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    padding: 10px;
+    transition: transform 0.2s ease;
+  }
+
   .achievement-badge:hover {
-    transform: scale(1.1) rotate(5deg);
-    box-shadow: 0 6px 20px hsl(var(--primary) / 0.5);
-    animation: achievement-pulse 1s ease-in-out infinite, gradient-flow 2s ease infinite, badge-rotate 2s linear infinite;
+    transform: scale(1.05);
   }
-  
-  @keyframes achievement-pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-  }
-  
-  @keyframes gradient-flow {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-  
-  @keyframes badge-rotate {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(5deg); }
-    75% { transform: rotate(-5deg); }
-  }
-  
-  /* Gamified progress bar with constant animation */
+
+  /* Clean progress bar */
   .progress-fun {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
-    background-size: 200% 100%;
-    animation: progress-glow 2s ease-in-out infinite;
+    background: var(--gradient-primary);
   }
-  
-  .progress-fun::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    background: linear-gradient(90deg, 
-      transparent, 
-      rgba(255, 255, 255, 0.3), 
-      transparent
-    );
-    animation: shimmer 2s infinite;
+
+  /* Resource links and checkboxes */
+  .resource-link-card {
+    transition: all 0.2s ease;
   }
-  
-  @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+
+  .resource-link-card:hover {
+    transform: translateY(-1px);
+    border-color: hsl(var(--primary) / 0.2) !important;
   }
-  
-  @keyframes progress-glow {
-    0%, 100% { 
-      background-position: 0% 50%;
-      box-shadow: 0 0 10px hsl(var(--primary) / 0.3);
-    }
-    50% { 
-      background-position: 100% 50%;
-      box-shadow: 0 0 20px hsl(var(--primary) / 0.5);
-    }
+
+  .interactive-glow {
+    transition: all 0.2s ease;
   }
-  
-  /* Responsive text sizing - enhanced */
-  .text-responsive {
-    @apply text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl;
-    line-height: 1.6;
+  .interactive-glow:hover {
+    transform: translateY(-1px);
   }
-  
-  .heading-responsive {
-    @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl;
-    line-height: 1.2;
+
+  .resource-progress-bar {
+    background: var(--gradient-primary);
+    transition: width 0.5s ease;
   }
-  
-  /* Mobile-first spacing */
-  .spacing-responsive {
-    @apply p-3 sm:p-4 md:p-6 lg:p-8 xl:p-12;
+
+  .resource-checkbox {
+    transition: transform 0.2s ease;
+    border-radius: 50%;
   }
-  
-  /* Responsive container padding */
-  .container-responsive {
-    @apply px-4 sm:px-6 md:px-8 lg:px-12;
+  .resource-checkbox:hover {
+    transform: scale(1.08);
   }
-  
-  /* Responsive gap utilities */
-  .gap-responsive {
-    @apply gap-3 sm:gap-4 md:gap-6 lg:gap-8;
-  }
-  
-  /* Responsive grid columns */
-  .grid-responsive {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
-  }
-  
-  /* Fun hover effects for cards - with constant subtle animation */
-  .fun-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 16px;
-    animation: fadeInUp 0.5s ease-out, card-float 6s ease-in-out infinite;
-    position: relative;
-  }
-  
-  .fun-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 16px;
-    background: linear-gradient(135deg, hsl(var(--primary) / 0.05) 0%, hsl(var(--secondary) / 0.05) 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-  }
-  
-  .fun-card:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 12px 30px hsl(var(--primary) / 0.2);
-    animation: fadeInUp 0.5s ease-out, card-float 3s ease-in-out infinite;
-  }
-  
-  .fun-card:hover::before {
-    opacity: 1;
-  }
-  
+
+  /* Fade-in for pages */
   @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
-  
-  @keyframes card-float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-3px); }
-  }
-  
+
   .animate-fadeInUp {
-    animation: fadeInUp 0.5s ease-out;
+    animation: fadeInUp 0.4s ease-out both;
   }
-  
-  /* Floating background elements */
-  .floating-bg {
-    animation: float 8s ease-in-out infinite;
+
+  /* Focus ring utility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary/60;
+    transition: all 0.15s ease;
   }
-  
-  .floating-bg-delayed {
-    animation: float 8s ease-in-out infinite;
-    animation-delay: -4s;
-  }
-  
-  @keyframes float {
-    0%, 100% { 
-      transform: translateY(0px) translateX(0px);
-      opacity: 0.1;
-    }
-    33% { 
-      transform: translateY(-20px) translateX(10px);
-      opacity: 0.15;
-    }
-    66% { 
-      transform: translateY(10px) translateX(-10px);
-      opacity: 0.12;
-    }
-  }
-  
-  /* Icon pulse animation */
-  .icon-pulse {
-    animation: icon-pulse 2s ease-in-out infinite;
-  }
-  
-  @keyframes icon-pulse {
-    0%, 100% { 
-      transform: scale(1);
-      opacity: 1;
-    }
-    50% { 
-      transform: scale(1.1);
-      opacity: 0.9;
-    }
-  }
-  
-  /* Constant glow effect */
-  .constant-glow {
-    animation: constant-glow 3s ease-in-out infinite;
-  }
-  
-  @keyframes constant-glow {
-    0%, 100% { 
-      box-shadow: 0 0 10px hsl(var(--primary) / 0.2);
-    }
-    50% { 
-      box-shadow: 0 0 20px hsl(var(--primary) / 0.4);
-    }
-  }
-  
-  /* Sparkle animation */
-  .sparkle {
-    animation: sparkle 2s ease-in-out infinite;
-  }
-  
-  @keyframes sparkle {
-    0%, 100% { 
-      transform: scale(1) rotate(0deg);
-      opacity: 1;
-    }
-    50% { 
-      transform: scale(1.2) rotate(180deg);
-      opacity: 0.8;
-    }
-  }
-  
-  /* Shadow card utility with constant subtle animation */
-  .shadow-card {
-    animation: shadow-pulse 4s ease-in-out infinite;
-  }
-  
-  @keyframes shadow-pulse {
-    0%, 100% { 
-      box-shadow: var(--card-shadow);
-    }
-    50% { 
-      box-shadow: 0 6px 12px -2px rgb(0 0 0 / 0.12), 0 4px 8px -4px rgb(0 0 0 / 0.12);
-    }
+
+  /* Responsive Utilities */
+  .text-responsive   { @apply text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl; line-height: 1.6; }
+  .heading-responsive{ @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl; line-height: 1.2; }
+  .spacing-responsive{ @apply p-3 sm:p-4 md:p-6 lg:p-8 xl:p-12; }
+  .container-responsive { @apply px-4 sm:px-6 md:px-8 lg:px-12; }
+  .gap-responsive    { @apply gap-3 sm:gap-4 md:gap-6 lg:gap-8; }
+  .grid-responsive   { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4; }
+
+  .timeline-connector { position: relative; }
+  .timeline-connector::before {
+    content: '';
+    position: absolute; left: 50%; top: 0; bottom: 0;
+    width: 2px;
+    background: hsl(var(--muted-foreground) / 0.3);
+    transform: translateX(-50%);
+    border-radius: 1px;
   }
 }

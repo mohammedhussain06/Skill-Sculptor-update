@@ -22,6 +22,7 @@ import LearnStepPage from '@/pages/LearnStepPage';
 import FlashcardGeneratePage from '@/pages/FlashcardGeneratePage';
 import QuizGeneratePage from '@/pages/QuizGeneratePage';
 import UploadPage from '@/pages/UploadPage';
+import { ThreeBackground } from '@/components/effects/ThreeBackground';
 
 const queryClient = new QueryClient();
 
@@ -47,7 +48,8 @@ function App() {
         <ThemeProvider>
           <TooltipProvider>
             <AuthProvider>
-              <div className="min-h-screen bg-background flex flex-col">
+              <div className="min-h-screen bg-background flex flex-col relative">
+                <ThreeBackground opacity={0.16} />
                 <Navigation />
                   <Routes>
                   {/* HomePage - full width, no container */}
