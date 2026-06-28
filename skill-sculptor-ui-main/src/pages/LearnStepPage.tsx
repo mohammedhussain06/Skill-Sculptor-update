@@ -107,7 +107,7 @@ export default function LearnStepPage() {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto">
+      <div className="py-6 sm:py-8 md:py-12 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto">
         <Card className="border-0 shadow-card bg-card/80 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="text-2xl">{step?.title || 'Learning'}</CardTitle>
@@ -247,21 +247,21 @@ export default function LearnStepPage() {
                 </div>
               </div>
             </div>
-            <div className="flex justify-between items-center">
-              <Button variant="outline" onClick={goBack} className="flex items-center space-x-2">
+            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 sm:gap-3">
+              <Button variant="outline" onClick={goBack} className="flex items-center justify-center space-x-2 w-full sm:w-auto">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 <span>Go Back</span>
               </Button>
-              <div className="flex space-x-3">
-                <Button variant="outline" onClick={() => navigate(`/roadmap/${roadmapId}`)}>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <Button variant="outline" onClick={() => navigate(`/roadmap/${roadmapId}`)} className="w-full sm:w-auto">
                   Return to Roadmap
                 </Button>
                 <Button 
                   onClick={handleCompleteStep}
                   disabled={isCompleting}
-                  className="bg-gradient-primary hover:opacity-90 border-0"
+                  className="bg-gradient-primary hover:opacity-90 border-0 w-full sm:w-auto"
                 >
                   <CheckCircle className="w-4 h-4 mr-2" />
                   {isCompleting ? "Completing..." : "Mark Step as Complete"}

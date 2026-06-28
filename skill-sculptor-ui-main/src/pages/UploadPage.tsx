@@ -115,9 +115,9 @@ const UploadPage = () => {
 
     return (
         <div className="min-h-screen bg-background">
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 py-6 md:py-8">
                 <div className="max-w-4xl mx-auto">
-                    <h1 className="text-4xl font-bold mb-2">Upload & Extract</h1>
+                    <h1 className="text-3xl md:text-4xl font-bold mb-2">Upload & Extract</h1>
                     <p className="text-muted-foreground mb-8">
                         Upload PDFs or images to extract text and generate learning materials
                     </p>
@@ -132,7 +132,7 @@ const UploadPage = () => {
                         <CardContent>
                             <div
                                 {...getRootProps()}
-                                className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors ${
+                                className={`border-2 border-dashed rounded-lg p-6 md:p-12 text-center cursor-pointer transition-colors ${
                                     isDragActive
                                         ? "border-primary bg-primary/5"
                                         : "border-muted-foreground/25 hover:border-primary/50"
@@ -185,7 +185,7 @@ const UploadPage = () => {
                                 <div className="bg-muted p-4 rounded-lg max-h-64 overflow-y-auto">
                                     <p className="text-sm whitespace-pre-wrap">{extractedText}</p>
                                 </div>
-                                <div className="flex gap-3">
+                                <div className="flex flex-col sm:flex-row gap-3">
                                     <Button onClick={handleGenerateFlashcards} className="flex-1">
                                         <Sparkles className="w-4 h-4 mr-2" />
                                         Generate Flashcards

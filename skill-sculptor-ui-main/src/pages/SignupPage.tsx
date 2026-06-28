@@ -76,9 +76,9 @@ export default function SignupPage() {
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-b from-background via-background/95 to-background relative overflow-hidden">
       {/* Full-width gradient background with subtle glows */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-primary/15 rounded-full blur-3xl opacity-60 floating-bg"></div>
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-secondary/15 rounded-full blur-3xl opacity-60 floating-bg-delayed"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl floating-bg" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute bottom-0 left-0 w-[250px] sm:w-[400px] md:w-[500px] h-[250px] sm:h-[400px] md:h-[500px] bg-primary/15 rounded-full blur-3xl opacity-60 floating-bg"></div>
+        <div className="absolute bottom-0 right-0 w-[250px] sm:w-[400px] md:w-[500px] h-[250px] sm:h-[400px] md:h-[500px] bg-secondary/15 rounded-full blur-3xl opacity-60 floating-bg-delayed"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[500px] md:w-[600px] h-[300px] sm:h-[500px] md:h-[600px] bg-primary/5 rounded-full blur-3xl floating-bg" style={{ animationDelay: '2s' }}></div>
       </div>
       
       <div className="relative z-10 w-full max-w-md px-4 sm:px-6 py-8">
@@ -87,7 +87,7 @@ export default function SignupPage() {
           <div className="mx-auto mb-6 p-4 rounded-full bg-gradient-primary w-20 h-20 flex items-center justify-center shadow-lg constant-glow">
             <Sparkles className="w-10 h-10 text-white sparkle" />
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Create Your Account</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">Create Your Account</h1>
           <p className="text-base text-white/80">Start your learning journey with SkillSculptor</p>
           </div>
           

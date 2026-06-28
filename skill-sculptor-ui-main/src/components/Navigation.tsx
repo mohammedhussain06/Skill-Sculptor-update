@@ -126,27 +126,46 @@ export function Navigation() {
       </div>
 
       {/* Mobile menu */}
-      {isMobileMenuOpen && isAuthenticated && (
+      {isMobileMenuOpen && (
         <div className="md:hidden bg-card/95 backdrop-blur-sm border-t border-border">
           <div className="px-2 pt-2 pb-3 space-y-1">
-            {authNavItems.map((item) => {
-              const Icon = item.icon;
-              return (
+            {isAuthenticated ? (
+              authNavItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={cn(
+                      'flex items-center px-3 py-2 rounded-md text-base font-medium',
+                      location.pathname.startsWith(item.path)
+                        ? 'bg-accent/50 text-foreground'
+                        : 'text-foreground/80 hover:bg-accent/50 hover:text-foreground'
+                    )}
+                  >
+                    <Icon className="w-5 h-5 mr-2" />
+                    {item.label}
+                  </Link>
+                );
+              })
+            ) : !isAuthPage ? (
+              <>
                 <Link
-                  key={item.path}
-                  to={item.path}
-                  className={cn(
-                    'flex items-center px-3 py-2 rounded-md text-base font-medium',
-                    location.pathname.startsWith(item.path)
-                      ? 'bg-accent/50 text-foreground'
-                      : 'text-foreground/80 hover:bg-accent/50 hover:text-foreground'
-                  )}
+                  to="/login"
+                  className="flex items-center px-3 py-2 rounded-md text-base font-medium text-foreground/80 hover:bg-accent/50 hover:text-foreground"
                 >
-                  <Icon className="w-5 h-5 mr-2" />
-                  {item.label}
+                  <LogIn className="w-5 h-5 mr-2" />
+                  Login
                 </Link>
-              );
-            })}
+                <Link
+                  to="/signup"
+                  className="flex items-center px-3 py-2 rounded-md text-base font-medium bg-gradient-primary text-white hover:opacity-90"
+                >
+                  <UserPlus className="w-5 h-5 mr-2" />
+                  Get Started
+                </Link>
+              </>
+            ) : null}
           </div>
         </div>
       )}

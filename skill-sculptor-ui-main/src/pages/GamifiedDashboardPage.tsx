@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { Trophy, Award, Flame, TrendingUp, Star, Target, Brain, BookOpen } from "lucide-react";
-import { Navigation } from "@/components/Navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -44,9 +43,11 @@ const GamifiedDashboardPage = () => {
     if (loading || !userProgress || !stats) {
         return (
             <div className="min-h-screen bg-background">
-                <Navigation />
                 <div className="flex items-center justify-center h-screen">
-                    <p>Loading dashboard...</p>
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                        <p className="text-muted-foreground">Loading dashboard...</p>
+                    </div>
                 </div>
             </div>
         );
@@ -56,56 +57,55 @@ const GamifiedDashboardPage = () => {
     const earnedBadges = badges.filter(b => b.earned);
 
     return (
-        <div className="min-h-screen bg-background">
-            <Navigation />
-            <div className="container mx-auto px-4 py-8">
+        <div className="min-h-screen bg-gradient-subtle">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
                 <div className="max-w-7xl mx-auto">
-                    <h1 className="text-4xl font-bold mb-2">Your Progress Dashboard</h1>
-                    <p className="text-muted-foreground mb-8">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">Your Progress Dashboard</h1>
+                    <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
                         Track your learning journey and achievements
                     </p>
 
                     {/* Level & XP Card */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                        <Card className="col-span-2">
-                            <CardHeader>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                        <Card className="md:col-span-2 fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm">
+                            <CardHeader className="p-4 sm:p-6">
                                 <div className="flex justify-between items-center">
                                     <div>
-                                        <CardTitle className="text-3xl">Level {stats.level}</CardTitle>
-                                        <CardDescription>
+                                        <CardTitle className="text-xl sm:text-2xl md:text-3xl">Level {stats.level}</CardTitle>
+                                        <CardDescription className="text-xs sm:text-sm">
                                             {stats.xpToNextLevel} XP to next level
                                         </CardDescription>
                                     </div>
-                                    <Star className="w-12 h-12 text-yellow-500" />
+                                    <Star className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-yellow-500 sparkle" />
                                 </div>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="p-4 sm:p-6 pt-0">
                                 <div className="space-y-2">
-                                    <div className="flex justify-between text-sm">
+                                    <div className="flex justify-between text-xs sm:text-sm">
                                         <span>XP Progress</span>
                                         <span className="font-medium">{stats.xp} XP</span>
                                     </div>
-                                    <Progress value={xpProgress} className="h-3" />
+                                    <Progress value={xpProgress} className="h-2 sm:h-3 progress-fun" />
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Flame className="w-6 h-6 text-orange-500" />
+                        <Card className="fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm">
+                            <CardHeader className="p-4 sm:p-6">
+                                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                                    <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" />
                                     Streak
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="p-4 sm:p-6 pt-0">
                                 <div className="text-center">
-                                    <div className="text-5xl font-bold text-orange-500 mb-2">
+                                    <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-orange-500 mb-2">
                                         {stats.currentStreak}
                                     </div>
-                                    <div className="text-sm text-muted-foreground">
+                                    <div className="text-xs sm:text-sm text-muted-foreground">
                                         Days in a row
                                     </div>
-                                    <div className="mt-4 pt-4 border-t">
+                                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t">
                                         <div className="text-xs text-muted-foreground">
                                             Longest: {stats.longestStreak} days
                                         </div>
@@ -116,64 +116,64 @@ const GamifiedDashboardPage = () => {
                     </div>
 
                     {/* Stats Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                        <Card>
-                            <CardContent className="pt-6">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                        <Card className="fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm">
+                            <CardContent className="p-3 sm:p-4 md:pt-6">
                                 <div className="text-center">
-                                    <BookOpen className="w-8 h-8 mx-auto mb-2 text-blue-500" />
-                                    <div className="text-2xl font-bold">{stats.totalQuizzes}</div>
+                                    <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 text-blue-500" />
+                                    <div className="text-xl sm:text-2xl font-bold">{stats.totalQuizzes}</div>
                                     <div className="text-xs text-muted-foreground">Quizzes Taken</div>
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card>
-                            <CardContent className="pt-6">
+                        <Card className="fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm">
+                            <CardContent className="p-3 sm:p-4 md:pt-6">
                                 <div className="text-center">
-                                    <Trophy className="w-8 h-8 mx-auto mb-2 text-green-500" />
-                                    <div className="text-2xl font-bold">{stats.quizzesPassed}</div>
+                                    <Trophy className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 text-green-500" />
+                                    <div className="text-xl sm:text-2xl font-bold">{stats.quizzesPassed}</div>
                                     <div className="text-xs text-muted-foreground">Quizzes Passed</div>
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card>
-                            <CardContent className="pt-6">
+                        <Card className="fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm">
+                            <CardContent className="p-3 sm:p-4 md:pt-6">
                                 <div className="text-center">
-                                    <Brain className="w-8 h-8 mx-auto mb-2 text-purple-500" />
-                                    <div className="text-2xl font-bold">{stats.totalFlashcardsCreated}</div>
+                                    <Brain className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 text-purple-500" />
+                                    <div className="text-xl sm:text-2xl font-bold">{stats.totalFlashcardsCreated}</div>
                                     <div className="text-xs text-muted-foreground">Flashcards Created</div>
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card>
-                            <CardContent className="pt-6">
+                        <Card className="fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm">
+                            <CardContent className="p-3 sm:p-4 md:pt-6">
                                 <div className="text-center">
-                                    <Target className="w-8 h-8 mx-auto mb-2 text-red-500" />
-                                    <div className="text-2xl font-bold">{stats.averageScore}%</div>
+                                    <Target className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 text-red-500" />
+                                    <div className="text-xl sm:text-2xl font-bold">{stats.averageScore}%</div>
                                     <div className="text-xs text-muted-foreground">Avg Score</div>
                                 </div>
                             </CardContent>
                         </Card>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
                         {/* Badges */}
-                        <Card>
-                            <CardHeader>
+                        <Card className="fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm">
+                            <CardHeader className="p-4 sm:p-6">
                                 <div className="flex justify-between items-center">
                                     <div>
-                                        <CardTitle className="flex items-center gap-2">
-                                            <Award className="w-6 h-6" />
+                                        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                                            <Award className="w-5 h-5 sm:w-6 sm:h-6" />
                                             Badges
                                         </CardTitle>
-                                        <CardDescription>
+                                        <CardDescription className="text-xs sm:text-sm">
                                             {earnedBadges.length} of {badges.length} earned
                                         </CardDescription>
                                     </div>
-                                    <Badge variant="outline">{earnedBadges.length}/{badges.length}</Badge>
+                                    <Badge variant="outline" className="text-xs">{earnedBadges.length}/{badges.length}</Badge>
                                 </div>
                             </CardHeader>
-                            <CardContent>
-                                <div className="grid grid-cols-3 gap-3 max-h-64 overflow-y-auto">
+                            <CardContent className="p-4 sm:p-6 pt-0">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 max-h-64 overflow-y-auto">
                                     {badges.map((badge, index) => (
                                         <div
                                             key={index}
@@ -199,21 +199,21 @@ const GamifiedDashboardPage = () => {
                         </Card>
 
                         {/* Leaderboard */}
-                        <Card>
-                            <CardHeader>
+                        <Card className="fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm">
+                            <CardHeader className="p-4 sm:p-6">
                                 <div className="flex justify-between items-center">
                                     <div>
-                                        <CardTitle className="flex items-center gap-2">
-                                            <TrendingUp className="w-6 h-6" />
+                                        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                                            <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" />
                                             Leaderboard
                                         </CardTitle>
-                                        <CardDescription>
+                                        <CardDescription className="text-xs sm:text-sm">
                                             Your rank: #{leaderboard[0]?.rank || "N/A"}
                                         </CardDescription>
                                     </div>
                                 </div>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="p-4 sm:p-6 pt-0">
                                 <div className="space-y-3 max-h-64 overflow-y-auto">
                                     {leaderboard.map((user, index) => (
                                         <div
@@ -253,13 +253,13 @@ const GamifiedDashboardPage = () => {
                     </div>
 
                     {/* Quick Actions */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Quick Actions</CardTitle>
-                            <CardDescription>Continue your learning journey</CardDescription>
+                    <Card className="fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm">
+                        <CardHeader className="p-4 sm:p-6">
+                            <CardTitle className="text-base sm:text-lg">Quick Actions</CardTitle>
+                            <CardDescription className="text-xs sm:text-sm">Continue your learning journey</CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <CardContent className="p-4 sm:p-6 pt-0">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                                 <Button onClick={() => navigate("/upload")} className="w-full">
                                     Upload Document
                                 </Button>

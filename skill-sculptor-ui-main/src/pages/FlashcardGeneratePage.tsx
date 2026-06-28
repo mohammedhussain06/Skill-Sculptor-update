@@ -87,10 +87,10 @@ const FlashcardGeneratePage = () => {
 
     return (
         <div className="min-h-screen bg-background">
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
                 <div className="max-w-4xl mx-auto">
-                    <h1 className="text-4xl font-bold mb-2">Generate Flashcards</h1>
-                    <p className="text-muted-foreground mb-8">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">Generate Flashcards</h1>
+                    <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
                         AI-generated flashcards from your text
                     </p>
 
@@ -134,11 +134,11 @@ const FlashcardGeneratePage = () => {
 
                     {flashcards.length > 0 && (
                         <>
-                            <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-2xl font-semibold">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sm:mb-6">
+                                <h2 className="text-xl sm:text-2xl font-semibold">
                                     {flashcards.length} Flashcards Generated
                                 </h2>
-                                <Button onClick={saveFlashcards} disabled={saving}>
+                                <Button onClick={saveFlashcards} disabled={saving} className="w-full sm:w-auto bg-gradient-primary hover:opacity-90 border-0">
                                     {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                                     <Save className="w-4 h-4 mr-2" />
                                     Save All
