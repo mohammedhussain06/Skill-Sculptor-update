@@ -10,35 +10,104 @@
 
 @layer base {
   :root {
-    /* === QUIET ACADEMIA DARK FOCUS PALETTE === */
+    /* === LIGHT MODE FOCUS THEME (DEFAULT) === */
+    --background: 210 30% 98%;
+    --background-secondary: 210 20% 95%;
+    --background-gradient: linear-gradient(180deg, hsl(210 30% 98%) 0%, hsl(210 20% 95%) 100%);
+    --foreground: 222 47% 15%;
+
+    /* Light Cards */
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 15%;
+    --card-shadow: 0 4px 18px rgba(0,0,0,0.04);
+    --card-hover: 0 8px 24px rgba(0,0,0,0.08);
+
+    /* Primary Cobalt/Blue */
+    --primary: 238 75% 58%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 238 75% 53%;
+    --primary-muted: 238 75% 95%;
+
+    /* Secondary Emerald/Teal */
+    --secondary: 172 60% 40%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 172 60% 35%;
+    --secondary-muted: 172 60% 95%;
+
+    /* Accent Amber */
+    --accent: 38 80% 55%;
+    --accent-foreground: 222 47% 15%;
+
+    /* Semantics */
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 150 60% 45%;
+    --success-foreground: 0 0% 98%;
+    --warning: 38 80% 55%;
+    --warning-foreground: 222 47% 15%;
+
+    /* Grays */
+    --muted: 210 20% 92%;
+    --muted-foreground: 210 10% 45%;
+    --muted-darker: 210 20% 86%;
+
+    /* Borders & Inputs */
+    --border: 210 20% 88%;
+    --border-focus: 238 75% 58%;
+    --input: 210 20% 92%;
+    --input-focus: 238 75% 58%;
+    --ring: 238 75% 58%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 15%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(238 75% 58%) 0%, hsl(172 60% 40%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(210 30% 98%) 0%, hsl(210 20% 95%) 100%);
+
+    --radius: 0.75rem;
+
+    /* Sidebar */
+    --sidebar-background: 210 20% 95%;
+    --sidebar-foreground: 222 47% 15%;
+    --sidebar-primary: 238 75% 58%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 20% 92%;
+    --sidebar-accent-foreground: 222 47% 15%;
+    --sidebar-border: 210 20% 88%;
+    --sidebar-ring: 238 75% 58%;
+  }
+
+  /* Dark focus mode (toggled via document element class "dark") */
+  .dark {
+    /* === DARK MODE FOCUS THEME === */
     --background: 222 47% 10%; /* Deep slate navy */
     --background-secondary: 222 40% 12%;
     --background-gradient: linear-gradient(180deg, hsl(222 47% 10%) 0%, hsl(224 45% 8%) 100%);
     --foreground: 215 20% 90%;
 
-    /* Calm Cards - clean and flat-ish with light borders */
+    /* Dark Cards */
     --card: 222 40% 13%;
     --card-foreground: 215 20% 90%;
     --card-shadow: 0 4px 20px rgba(0,0,0,0.3);
     --card-hover: 0 8px 30px rgba(0,0,0,0.4);
 
-    /* === PRIMARY — Focused Soft Indigo === */
+    /* Primary Soft Indigo */
     --primary: 238 85% 68%;
     --primary-foreground: 0 0% 100%;
     --primary-hover: 238 85% 72%;
     --primary-muted: 238 85% 15%;
 
-    /* === SECONDARY — Warm Calm Sage/Teal === */
+    /* Secondary Sage/Teal */
     --secondary: 172 70% 48%;
     --secondary-foreground: 222 47% 10%;
     --secondary-hover: 172 70% 54%;
     --secondary-muted: 172 70% 10%;
 
-    /* === ACCENT — Soft Gold/Warm Amber === */
+    /* Accent Gold */
     --accent: 38 80% 55%;
     --accent-foreground: 222 47% 10%;
 
-    /* Semantic colors */
     --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 98%;
     --success: 150 60% 45%;
@@ -46,7 +115,7 @@
     --warning: 38 80% 55%;
     --warning-foreground: 222 47% 10%;
 
-    /* Muted Grays */
+    /* Grays */
     --muted: 222 25% 18%;
     --muted-foreground: 215 15% 65%;
     --muted-darker: 222 25% 22%;
@@ -61,12 +130,11 @@
     --popover: 222 40% 13%;
     --popover-foreground: 215 20% 90%;
 
-    /* Gentle gradients */
+    /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(238 85% 68%) 0%, hsl(172 70% 48%) 100%);
     --gradient-subtle: linear-gradient(180deg, hsl(222 47% 10%) 0%, hsl(224 45% 8%) 100%);
 
-    --radius: 0.75rem;
-
+    /* Sidebar */
     --sidebar-background: 222 40% 13%;
     --sidebar-foreground: 215 20% 90%;
     --sidebar-primary: 238 85% 68%;
@@ -75,40 +143,6 @@
     --sidebar-accent-foreground: 215 20% 90%;
     --sidebar-border: 222 25% 20%;
     --sidebar-ring: 238 85% 68%;
-  }
-
-  /* Light focus mode */
-  .light {
-    --background: 210 30% 98%;
-    --background-secondary: 210 20% 95%;
-    --background-gradient: linear-gradient(180deg, hsl(210 30% 98%) 0%, hsl(210 20% 95%) 100%);
-    --foreground: 222 47% 15%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 15%;
-    --card-shadow: 0 4px 18px rgba(0,0,0,0.04);
-    --card-hover: 0 8px 24px rgba(0,0,0,0.08);
-
-    --primary: 238 75% 58%;
-    --primary-foreground: 0 0% 100%;
-    --primary-hover: 238 75% 53%;
-    --primary-muted: 238 75% 95%;
-
-    --secondary: 172 60% 40%;
-    --secondary-foreground: 0 0% 100%;
-    --secondary-hover: 172 60% 35%;
-    --secondary-muted: 172 60% 95%;
-
-    --muted: 210 20% 92%;
-    --muted-foreground: 210 10% 45%;
-    --muted-darker: 210 20% 86%;
-
-    --border: 210 20% 88%;
-    --input: 210 20% 92%;
-    --ring: 238 75% 58%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 15%;
   }
 }
 
@@ -295,5 +329,12 @@
     background: hsl(var(--muted-foreground) / 0.3);
     transform: translateX(-50%);
     border-radius: 1px;
+  }
+
+  /* Ensure the persistent ThreeBackground is visible behind all pages */
+  .min-h-screen.bg-gradient-subtle,
+  .min-h-screen.bg-background {
+    background-color: transparent !important;
+    background-image: none !important;
   }
 }
