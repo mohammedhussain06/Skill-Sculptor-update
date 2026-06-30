@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useNavigate, useParams } from 'react-router-dom';
-import { CheckCircle, Circle, Clock, ArrowRight, BookOpen, ExternalLink, Video, Globe, GraduationCap, LayoutDashboard, Trash2 } from 'lucide-react';
+import { CheckCircle, Circle, Clock, ArrowRight, BookOpen, ExternalLink, Video, Globe, GraduationCap, LayoutDashboard, Trash2, Award, Sparkles } from 'lucide-react';
 import API from '../../api/axios';
 import { useToast } from '@/hooks/use-toast';
 import { DeleteRoadmapDialog } from '@/components/DeleteRoadmapDialog';
@@ -17,6 +17,8 @@ export default function RoadmapPage() {
   const [roadmapTitle, setRoadmapTitle] = useState<string>('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'mindmap'>('list');
+  const [showCongrats, setShowCongrats] = useState(false);
+  const [hasDismissedCongrats, setHasDismissedCongrats] = useState(false);
   const navigate = useNavigate();
   const { id: roadmapId } = useParams();
   const { toast } = useToast();
@@ -120,6 +122,15 @@ export default function RoadmapPage() {
       setProgress(calculatedProgress);
     }
   }, [roadmapSteps, roadmapId]);
+
+  // Congratulate user once they reach 100% completion of resources
+  useEffect(() => {
+    if (progress.percentage === 100 && progress.total > 0 && !hasDismissedCongrats) {
+      setShowCongrats(true);
+    } else {
+      setShowCongrats(false);
+    }
+  }, [progress, hasDismissedCongrats]);
 
   const triggerProgressRefresh = () => {
     if (roadmapSteps.length > 0 && roadmapId) {
@@ -290,6 +301,75 @@ export default function RoadmapPage() {
           </div>
         )}
       </div>
+
+      {/* ── CONGRATULATIONS MODAL ── */}
+      {showCongrats && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fadeIn">
+          <div className="bg-card/90 border border-success/30 shadow-glow p-6 sm:p-8 rounded-3xl max-w-md w-full text-center relative overflow-hidden congrats-modal">
+            <style>
+              {`
+                @keyframes pop-in {
+                  0% { transform: scale(0.9) translateY(10px); opacity: 0; }
+                  100% { transform: scale(1) translateY(0); opacity: 1; }
+                }
+                .congrats-modal {
+                  animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+                }
+              `}
+            </style>
+            
+            {/* Confetti particles */}
+            <div className="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-45">
+              <span className="absolute top-2 left-6 text-xl animate-bounce" style={{ animationDelay: '0.1s' }}>🎉</span>
+              <span className="absolute top-8 right-12 text-lg animate-bounce" style={{ animationDelay: '0.4s' }}>✨</span>
+              <span className="absolute bottom-10 left-10 text-xl animate-bounce" style={{ animationDelay: '0.7s' }}>🏆</span>
+              <span className="absolute bottom-6 right-6 text-lg animate-bounce" style={{ animationDelay: '0.2s' }}>🚀</span>
+              <span className="absolute top-1/2 left-4 text-sm opacity-50">⭐</span>
+              <span className="absolute top-1/3 right-4 text-sm opacity-50">⭐</span>
+            </div>
+
+            {/* Medal Badge */}
+            <div className="w-16 h-16 bg-success/15 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-success/30 relative">
+              <Award className="w-8 h-8 text-success animate-bounce" />
+              <span className="absolute inset-0 rounded-full border border-success animate-ping opacity-35" />
+            </div>
+
+            <h2 className="text-xl sm:text-2xl font-black text-foreground mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+              Campaign Complete! 🏆
+            </h2>
+            
+            <p className="text-muted-foreground text-sm font-medium mb-6 leading-relaxed px-2">
+              Congratulations! You have completed 100% of your <span className="text-foreground font-bold font-semibold">"{roadmapTitle}"</span> campaign. You've conquered every step and unlocked all milestone quests!
+            </p>
+
+            <div className="flex flex-col gap-2.5">
+              <Button
+                onClick={() => navigate('/query-form?new=1')}
+                className="w-full font-bold h-11 bg-gradient-primary border-0 text-white shadow-glow hover:scale-102 transition-transform"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Learn Something New
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={() => navigate('/dashboard')}
+                className="w-full font-bold h-11 border-border bg-card/50 hover:bg-muted text-foreground"
+              >
+                Go to Dashboard
+              </Button>
+
+              <Button
+                variant="ghost"
+                onClick={() => setHasDismissedCongrats(true)}
+                className="w-full font-bold h-11 text-muted-foreground hover:text-foreground hover:bg-muted/40"
+              >
+                Skip & Review Map
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

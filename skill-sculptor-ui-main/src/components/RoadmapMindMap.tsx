@@ -127,17 +127,37 @@ export function RoadmapMindMap({ steps, roadmapId, title, onProgressUpdate }: Ro
     const currentCompleted = completionsMap[stepIdx] || [];
     let updated: number[];
 
+    const logKey = 'completed_activities_log';
+    const rawLog = localStorage.getItem(logKey);
+    let log = rawLog ? JSON.parse(rawLog) : [];
+
     if (currentCompleted.includes(resIdx)) {
       updated = currentCompleted.filter(i => i !== resIdx);
+      // Remove from global activity log
+      log = log.filter((item: any) => !(item.roadmapId === roadmapId && item.stepIdx === stepIdx && item.resIdx === resIdx));
     } else {
       updated = [...currentCompleted, resIdx];
       // Play level-up click animation effect
       const animationId = `${stepIdx}-${resIdx}`;
       setLastToggledKey(animationId);
       setTimeout(() => setLastToggledKey(null), 400);
+
+      // Add to global activity log
+      const resObj = steps[stepIdx]?.resources?.[resIdx];
+      const newEntry = {
+        roadmapId,
+        stepIdx,
+        resIdx,
+        title: resObj?.title || 'Resource',
+        stepTitle: steps[stepIdx].title,
+        roadmapTitle: title || 'Roadmap',
+        timestamp: new Date().toISOString()
+      };
+      log = [...log.filter((item: any) => !(item.roadmapId === roadmapId && item.stepIdx === stepIdx && item.resIdx === resIdx)), newEntry];
     }
 
     localStorage.setItem(key, JSON.stringify(updated));
+    localStorage.setItem(logKey, JSON.stringify(log));
     loadAllCompletions();
 
     if (onProgressUpdate) {

@@ -146,51 +146,160 @@ export default function DashboardPage() {
     return streak;
   };
 
+  // Calculate local progress based on localStorage checklists (syncing with user activity!)
+  const calculateLocalProgress = (roadmapSteps: any[], rId: string) => {
+    if (!roadmapSteps || roadmapSteps.length === 0) return 0;
+    let totalResources = 0;
+    let completedResources = 0;
+
+    roadmapSteps.forEach((step, stepIndex) => {
+      if (step.resources && step.resources.length > 0) {
+        totalResources += step.resources.length;
+        const key = `completed_resources_${rId}_${stepIndex}`;
+        const saved = localStorage.getItem(key);
+        if (saved) {
+          const completedSet = new Set(JSON.parse(saved));
+          completedResources += completedSet.size;
+        }
+      }
+    });
+
+    return totalResources > 0 ? Math.round((completedResources / totalResources) * 100) : 0;
+  };
+
+  // Find currently learning and next milestone step dynamically based on local progress
+  const getLocalStepProgression = (roadmapSteps: any[], rId: string) => {
+    if (!roadmapSteps || roadmapSteps.length === 0) {
+      return { currentStep: "Start learning soon", nextMilestone: "Next module" };
+    }
+    
+    // Find the first step that is not 100% completed locally
+    let currentIdx = 0;
+    for (let i = 0; i < roadmapSteps.length; i++) {
+      const step = roadmapSteps[i];
+      const total = step.resources?.length || 0;
+      const key = `completed_resources_${rId}_${i}`;
+      const saved = localStorage.getItem(key);
+      const completed = saved ? JSON.parse(saved).length : 0;
+      
+      if (total > 0 && completed < total) {
+        currentIdx = i;
+        break;
+      }
+      if (i === roadmapSteps.length - 1) {
+        currentIdx = roadmapSteps.length - 1;
+      }
+    }
+    
+    const currentStepObj = roadmapSteps[currentIdx];
+    const nextStepObj = currentIdx + 1 < roadmapSteps.length ? roadmapSteps[currentIdx + 1] : null;
+    
+    return {
+      currentStep: currentStepObj?.title || "Start learning soon",
+      nextMilestone: nextStepObj?.title || "All levels conquered! 🏆"
+    };
+  };
+
+  const localProgression = getLocalStepProgression(steps, populatedFirst?._id || '');
+  const localProgressPercent = populatedFirst?._id ? calculateLocalProgress(steps, populatedFirst._id) : 0;
+
   const currentRoadmap = {
     skill: populatedFirst?.skill || "No skill yet",
-    progress: steps.length ? Math.round((steps.filter((s: any) => s.status === 'completed').length / steps.length) * 100) : 0,
-    currentStep: currentStepObj?.title || "Start learning soon",
-    nextMilestone: nextStepObj?.title || "Next module",
+    progress: localProgressPercent,
+    currentStep: localProgression.currentStep,
+    nextMilestone: localProgression.nextMilestone,
     estimatedCompletion: calculateEstimatedCompletion()
   };
 
+  // Calculate local completion metrics
+  const localCompletedStepsCount = steps.filter((step: any, stepIdx: number) => {
+    const total = step.resources?.length || 0;
+    const key = `completed_resources_${populatedFirst?._id || ''}_${stepIdx}`;
+    const saved = localStorage.getItem(key);
+    const completed = saved ? JSON.parse(saved).length : 0;
+    return total > 0 && completed === total;
+  }).length;
+
+  const calculateLocalStreak = () => {
+    const rawLog = localStorage.getItem('completed_activities_log');
+    const log = rawLog ? JSON.parse(rawLog) : [];
+    if (!log.length) return 0;
+    
+    const uniqueDates = Array.from(new Set(log.map((item: any) => {
+      if (!item.timestamp) return '';
+      const date = new Date(item.timestamp);
+      date.setHours(0, 0, 0, 0);
+      return date.getTime();
+    })))
+    .filter(Boolean)
+    .sort((a: any, b: any) => b - a);
+
+    if (!uniqueDates.length) return 0;
+
+    let streak = 0;
+    let checkDate = new Date();
+    checkDate.setHours(0, 0, 0, 0);
+
+    const latestLogTime = uniqueDates[0] as number;
+    const diffDays = Math.floor((checkDate.getTime() - latestLogTime) / (1000 * 60 * 60 * 24));
+    if (diffDays > 1) return 0;
+
+    for (const logTime of uniqueDates) {
+      const diff = Math.floor((checkDate.getTime() - (logTime as number)) / (1000 * 60 * 60 * 24));
+      if (diff === 0 || diff === 1) {
+        streak++;
+        checkDate.setTime(logTime as number);
+      } else {
+        break;
+      }
+    }
+    return streak;
+  };
+
+  const localStreak = calculateLocalStreak();
+
   const stats = [
-    { label: "Current Streak", value: calculateCurrentStreak(), unit: "days", icon: TrendingUp, color: "text-success", badgeGlow: "bg-cyan-500/10 border-cyan-500/15" },
+    { label: "Current Streak", value: localStreak, unit: "days", icon: TrendingUp, color: "text-success", badgeGlow: "bg-cyan-500/10 border-cyan-500/15" },
     { label: "Skills Learning", value: dashboard.savedRoadmaps?.length || 0, unit: "active", icon: Target, color: "text-primary", badgeGlow: "bg-primary/10 border-primary/15" },
-    { label: "Milestones", value: dashboard.completedSteps?.length || 0, unit: "completed", icon: Award, color: "text-secondary", badgeGlow: "bg-amber-500/10 border-amber-500/15" }
+    { label: "Milestones", value: localCompletedStepsCount, unit: "completed", icon: Award, color: "text-secondary", badgeGlow: "bg-amber-500/10 border-amber-500/15" }
   ];
 
-  // Enhanced recent activities with better formatting and more activity types
+  // Enhanced recent activities with better formatting and more activity types (synced locally!)
   const getRecentActivities = () => {
-    const activities = [];
+    const rawLog = localStorage.getItem('completed_activities_log');
+    const log = rawLog ? JSON.parse(rawLog) : [];
     
-    // Add completed steps
-    if (dashboard.completedSteps?.length) {
-      const recentSteps = dashboard.completedSteps
-        .slice(-5)
-        .reverse()
-        .map((step: any) => ({
-          date: step.completedAt ? new Date(step.completedAt).toLocaleDateString() : "—",
-          activity: step.stepTitle ? `Completed ${step.stepTitle}` : "Completed a milestone",
+    const activities = log
+      .slice(-3) // Get latest 3 activities
+      .reverse()
+      .map((item: any) => {
+        const itemDate = new Date(item.timestamp);
+        const relativeDate = isNaN(itemDate.getTime()) 
+          ? "—" 
+          : itemDate.toLocaleDateString() === new Date().toLocaleDateString()
+          ? "Today"
+          : itemDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+        return {
+          date: relativeDate,
+          activity: `Completed "${item.title}" in ${item.roadmapTitle}`,
           type: "completion",
           icon: CheckCircle,
           color: "text-success"
-        }));
-      activities.push(...recentSteps);
-    }
-    
-    // Add roadmap creation if recent
-    if (dashboard.savedRoadmaps?.length) {
-      const roadmapCreation = {
+        };
+      });
+
+    // If log has fewer than 3 entries, add starting roadmap activity
+    if (activities.length === 0 && dashboard.savedRoadmaps?.length) {
+      activities.push({
         date: "Today",
         activity: `Started learning ${populatedFirst?.skill || "new skill"}`,
         type: "roadmap_creation",
         icon: Target,
         color: "text-primary"
-      };
-      activities.unshift(roadmapCreation);
+      });
     }
-    
+
     // Fill with placeholder if needed
     while (activities.length < 3) {
       activities.push({
@@ -201,8 +310,8 @@ export default function DashboardPage() {
         color: "text-muted-foreground"
       });
     }
-    
-    return activities.slice(0, 3);
+
+    return activities;
   };
 
   const recentActivities = getRecentActivities();
