@@ -481,7 +481,7 @@ export default function PlannerPage() {
                         key={idx}
                         className={cn(
                           "w-3.5 h-3.5 rounded-sm transition-all duration-300 relative group cursor-pointer",
-                          intensity === 0 && "bg-white/5 border border-white/5 hover:bg-white/10",
+                          intensity === 0 && "bg-neutral-200/50 dark:bg-white/5 border border-neutral-300/30 dark:border-white/5 hover:bg-neutral-300/50 dark:hover:bg-white/10",
                           intensity === 1 && "bg-emerald-500/20 border border-emerald-500/10 hover:bg-emerald-500/35",
                           intensity === 2 && "bg-emerald-500/45 border border-emerald-500/20 hover:bg-emerald-500/60",
                           intensity === 3 && "bg-emerald-500/70 border border-emerald-500/35 hover:bg-emerald-500/85",
@@ -504,7 +504,7 @@ export default function PlannerPage() {
               {/* Legend */}
               <div className="flex items-center justify-end space-x-1.5 mt-3 text-[10px] font-bold text-muted-foreground select-none">
                 <span>Less</span>
-                <div className="w-2.5 h-2.5 rounded-sm bg-white/5 border border-white/5" />
+                <div className="w-2.5 h-2.5 rounded-sm bg-neutral-200/50 dark:bg-white/5 border border-neutral-300/30 dark:border-white/5" />
                 <div className="w-2.5 h-2.5 rounded-sm bg-emerald-500/20" />
                 <div className="w-2.5 h-2.5 rounded-sm bg-emerald-500/45" />
                 <div className="w-2.5 h-2.5 rounded-sm bg-emerald-500/70" />
@@ -547,7 +547,7 @@ export default function PlannerPage() {
                 {/* Day Cells */}
                 {calendarCells.map((dateObj, cellIdx) => {
                   if (!dateObj) {
-                    return <div key={`empty-${cellIdx}`} className="aspect-square bg-white/1 rounded-xl opacity-20" />;
+                    return <div key={`empty-${cellIdx}`} className="aspect-square bg-neutral-100/50 dark:bg-white/1 rounded-xl opacity-20" />;
                   }
 
                   const dayNum = dateObj.getDate();
@@ -565,7 +565,7 @@ export default function PlannerPage() {
                         "aspect-square p-1.5 sm:p-2.5 rounded-xl border flex flex-col justify-between transition-all cursor-pointer select-none group min-h-[75px] sm:min-h-[90px]",
                         isToday 
                           ? "bg-primary/5 border-primary/20 hover:bg-primary/8 hover:border-primary/30" 
-                          : "bg-white/3 border-white/5 hover:bg-white/5 hover:border-white/10"
+                          : "bg-neutral-50 dark:bg-white/3 border-neutral-200 dark:border-white/5 hover:bg-neutral-100 dark:hover:bg-white/5 hover:border-neutral-300 dark:hover:border-white/10"
                       )}
                     >
                       {/* Day Label */}
@@ -639,7 +639,7 @@ export default function PlannerPage() {
                       <div 
                         key={item.id} 
                         onClick={() => handleToggleMilestone(item.id)}
-                        className="p-3 rounded-xl bg-white/3 border border-white/5 hover:bg-white/5 hover:border-white/10 cursor-pointer flex items-start justify-between gap-3 group transition-all"
+                        className="p-3 rounded-xl bg-neutral-50 dark:bg-white/3 border border-neutral-200 dark:border-white/5 hover:bg-neutral-100 dark:hover:bg-white/5 hover:border-neutral-300 dark:hover:border-white/10 cursor-pointer flex items-start justify-between gap-3 group transition-all"
                       >
                         <div className="min-w-0">
                           <h4 className="text-xs font-bold text-foreground truncate">{item.stepTitle}</h4>
