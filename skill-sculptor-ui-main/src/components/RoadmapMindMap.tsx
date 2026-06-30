@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Circle, Clock, Play, GraduationCap, Lock, ZoomIn, ZoomOut, RotateCcw, Shield, Award, Sparkles, CheckSquare, Square } from 'lucide-react';
+import { CheckCircle, Circle, Clock, Play, GraduationCap, Lock, ZoomIn, ZoomOut, RotateCcw, Shield, Award, Sparkles, CheckSquare, Square, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { StudyNotepadDrawer } from './StudyNotepadDrawer';
 
 interface Resource {
   title: string;
@@ -46,6 +47,7 @@ export function RoadmapMindMap({ steps, roadmapId, title, onProgressUpdate }: Ro
   // Track completions of all steps locally to compute game levels
   const [completionsMap, setCompletionsMap] = useState<Record<number, number[]>>({});
   const [lastToggledKey, setLastToggledKey] = useState<string | null>(null);
+  const [isNotesOpen, setIsNotesOpen] = useState<boolean>(false);
 
   // Drag-to-pan & Zoom states
   const [pan, setPan] = useState({ x: 100, y: 50 });
@@ -761,16 +763,25 @@ export function RoadmapMindMap({ steps, roadmapId, title, onProgressUpdate }: Ro
           )}
 
           {/* Action Trigger */}
-          <div className="flex justify-end pt-2">
+          <div className="flex justify-end items-center gap-3 pt-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsNotesOpen(true)}
+              className="font-bold h-11 border-border bg-card hover:bg-muted text-foreground"
+            >
+              <FileText className="w-4 h-4 mr-2 text-primary" />
+              Study Notes
+            </Button>
+
             {!isLevelUnlocked(selectedIdx) ? (
-              <Button disabled className="w-full sm:w-auto font-bold h-11 border border-white/5 opacity-50">
+              <Button disabled className="font-bold h-11 border border-white/5 opacity-50">
                 <Lock className="w-4 h-4 mr-2" />
-                Level Locked (Complete Previous Level Quests)
+                Level Locked
               </Button>
             ) : (
               <Button
                 onClick={() => navigate(`/learn/${roadmapId}/${selectedIdx}`)}
-                className="w-full sm:w-auto font-bold h-11 bg-gradient-primary border-0 text-white shadow-glow hover:scale-102 transition-transform"
+                className="font-bold h-11 bg-gradient-primary border-0 text-white shadow-glow hover:scale-102 transition-transform"
               >
                 <Play className="w-4 h-4 mr-2" />
                 Start Level Campaign
@@ -779,6 +790,15 @@ export function RoadmapMindMap({ steps, roadmapId, title, onProgressUpdate }: Ro
           </div>
         </CardContent>
       </Card>
+
+      {/* Study Notepad slide-out drawer */}
+      <StudyNotepadDrawer
+        isOpen={isNotesOpen}
+        onClose={() => setIsNotesOpen(false)}
+        roadmapId={roadmapId}
+        stepIdx={selectedIdx}
+        stepTitle={selectedStep.title}
+      />
 
     </div>
   );

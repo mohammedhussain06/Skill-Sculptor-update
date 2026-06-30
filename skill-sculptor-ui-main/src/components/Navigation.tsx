@@ -1,7 +1,7 @@
 // In src/components/Navigation.tsx
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Sparkles, User, LogIn, UserPlus, Menu, X, Brain, Trophy, Award, LogOut, Zap } from 'lucide-react';
+import { Sparkles, User, LogIn, UserPlus, Menu, X, Brain, Trophy, Award, LogOut, Zap, Calendar } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 
 // Navigation items for authenticated users
 const authNavItems = [
+  { path: '/planner', icon: Calendar, label: 'Planner', color: 'group-hover:text-emerald-400' },
   { path: '/flashcards', icon: Brain, label: 'Flashcards', color: 'group-hover:text-violet-400' },
   { path: '/quiz', icon: Trophy, label: 'Quiz', color: 'group-hover:text-cyan-400' },
   { path: '/progress', icon: Award, label: 'Progress', color: 'group-hover:text-amber-400' },

@@ -16,6 +16,7 @@ import FlashcardsPage from '@/pages/FlashcardsPage';
 import QuizListPage from '@/pages/QuizListPage';
 import QuizTakePage from '@/pages/QuizTakePage';
 import AnalyticsPage from '@/pages/AnalyticsPage';
+import PlannerPage from '@/pages/PlannerPage';
 import RoadmapPage from '@/pages/RoadmapPage';
 import RoadmapListPage from '@/pages/RoadmapListPage';
 import LearnStepPage from '@/pages/LearnStepPage';
@@ -111,10 +112,18 @@ function App() {
                       path="/progress"
                       element={
                         <ProtectedRoute>
-                        <AnalyticsPage />
-                      </ProtectedRoute>
-                    }
-                  />
+                          <AnalyticsPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/planner"
+                      element={
+                        <ProtectedRoute>
+                          <PlannerPage />
+                        </ProtectedRoute>
+                      }
+                    />
                   <Route
                     path="/roadmap/:id"
                     element={

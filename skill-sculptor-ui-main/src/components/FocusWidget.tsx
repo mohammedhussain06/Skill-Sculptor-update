@@ -221,6 +221,17 @@ export function FocusWidget() {
             playAlertChime();
             return 0;
           }
+          
+          // Log active focus seconds for today (only in 'focus' mode)
+          if (timerMode === 'focus') {
+            const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+            const key = 'study_focus_seconds_log';
+            const raw = localStorage.getItem(key);
+            const logs = raw ? JSON.parse(raw) : {};
+            logs[todayStr] = (logs[todayStr] || 0) + 1;
+            localStorage.setItem(key, JSON.stringify(logs));
+          }
+          
           return prev - 1;
         });
       }, 1000);
