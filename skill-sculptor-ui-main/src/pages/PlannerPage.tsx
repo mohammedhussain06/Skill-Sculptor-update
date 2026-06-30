@@ -547,7 +547,7 @@ export default function PlannerPage() {
                 {/* Day Cells */}
                 {calendarCells.map((dateObj, cellIdx) => {
                   if (!dateObj) {
-                    return <div key={`empty-${cellIdx}`} className="aspect-square bg-neutral-100/50 dark:bg-white/1 rounded-xl opacity-20" />;
+                    return <div key={`empty-${cellIdx}`} className="aspect-square bg-card/10 border border-border/5 rounded-xl opacity-40" />;
                   }
 
                   const dayNum = dateObj.getDate();
@@ -564,8 +564,8 @@ export default function PlannerPage() {
                       className={cn(
                         "aspect-square p-1.5 sm:p-2.5 rounded-xl border flex flex-col justify-between transition-all cursor-pointer select-none group min-h-[75px] sm:min-h-[90px]",
                         isToday 
-                          ? "bg-primary/5 border-primary/20 hover:bg-primary/8 hover:border-primary/30" 
-                          : "bg-neutral-50 dark:bg-white/3 border-neutral-200 dark:border-white/5 hover:bg-neutral-100 dark:hover:bg-white/5 hover:border-neutral-300 dark:hover:border-white/10"
+                          ? "bg-primary/5 border-primary/25 hover:bg-primary/10 hover:border-primary/40" 
+                          : "bg-card/45 border-border/40 hover:bg-card/85 hover:border-border/70"
                       )}
                     >
                       {/* Day Label */}
