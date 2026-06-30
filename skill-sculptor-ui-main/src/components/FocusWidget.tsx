@@ -83,22 +83,23 @@ export function FocusWidget() {
     rainSourceRef.current = rainSource;
     rainGainRef.current = rainGain;
 
-    // 2. Setup Cozy Synth Hum (Procedural Warm Harmonics + LFO)
+    // 2. Setup Cozy Synth Hum (Procedural Warm Harmonics + Sweeping LFO Pad)
     const synthGain = ctx.createGain();
     synthGain.gain.setValueAtTime(0, ctx.currentTime);
 
-    // Warm base oscillators
-    const frequencies = [65.41, 130.81, 196.00]; // C2, C3, G3
+    // Mid-frequency base oscillators (highly audible on laptop/mobile speakers)
+    const frequencies = [130.81, 196.00, 261.63, 329.63]; // C3, G3, C4, E4
     const oscs: OscillatorNode[] = [];
     
     frequencies.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
-      osc.type = idx === 2 ? 'sine' : 'triangle';
+      // Triangle waves for warm, vintage keyboard vibe
+      osc.type = 'triangle';
       osc.frequency.setValueAtTime(freq, ctx.currentTime);
 
       const oscGain = ctx.createGain();
-      // Detune weights
-      oscGain.gain.setValueAtTime(idx === 0 ? 0.4 : idx === 1 ? 0.3 : 0.2, ctx.currentTime);
+      // Balanced detuned amplitude weights
+      oscGain.gain.setValueAtTime(idx === 0 ? 0.35 : idx === 1 ? 0.25 : idx === 2 ? 0.2 : 0.15, ctx.currentTime);
 
       osc.connect(oscGain);
       oscGain.connect(synthGain);
@@ -108,18 +109,18 @@ export function FocusWidget() {
 
     const synthFilter = ctx.createBiquadFilter();
     synthFilter.type = 'lowpass';
-    synthFilter.frequency.setValueAtTime(220, ctx.currentTime);
+    synthFilter.frequency.setValueAtTime(400, ctx.currentTime);
 
-    // Slowly modulating LFO to simulate breathing pad
+    // Slowly modulating LFO to simulate breathing filter sweep (audible & warm)
     const lfo = ctx.createOscillator();
     lfo.type = 'sine';
-    lfo.frequency.setValueAtTime(0.12, ctx.currentTime); // very slow
+    lfo.frequency.setValueAtTime(0.08, ctx.currentTime); // slow breathing
 
     const lfoGain = ctx.createGain();
-    lfoGain.gain.setValueAtTime(0.06, ctx.currentTime);
+    lfoGain.gain.setValueAtTime(120, ctx.currentTime); // sweep filter up/down by 120Hz
 
     lfo.connect(lfoGain);
-    lfoGain.connect(synthFilter.frequency); // modulate lowpass filter
+    lfoGain.connect(synthFilter.frequency); // Sweep the lowpass filter frequency
     lfo.start();
 
     synthGain.connect(synthFilter);
@@ -132,20 +133,21 @@ export function FocusWidget() {
     const campBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const campData = campBuffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
-      // Sporadic impulses representing crackles
-      const crackle = Math.random() > 0.9996 ? (Math.random() * 2 - 1) : 0;
-      // Gentle wind/rumble
-      const rumble = (Math.random() * 2 - 1) * 0.04;
-      campData[i] = crackle + rumble;
+      // Sporadic crackle pops (vivid impulses)
+      const crackle = Math.random() > 0.9998 ? (Math.random() * 2 - 1) * 0.8 : 0;
+      // Deep, warm fire roar (white noise rumble)
+      const fireRoar = (Math.random() * 2 - 1) * 0.05;
+      campData[i] = crackle + fireRoar;
     }
 
     const campSource = ctx.createBufferSource();
     campSource.buffer = campBuffer;
     campSource.loop = true;
 
+    // Lowpass filter at 2000Hz lets through deep rumble + crisp pops (no bandpass choking)
     const campFilter = ctx.createBiquadFilter();
-    campFilter.type = 'bandpass';
-    campFilter.frequency.setValueAtTime(1400, ctx.currentTime);
+    campFilter.type = 'lowpass';
+    campFilter.frequency.setValueAtTime(2000, ctx.currentTime);
 
     const campGain = ctx.createGain();
     campGain.gain.setValueAtTime(0, ctx.currentTime);

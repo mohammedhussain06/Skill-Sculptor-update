@@ -121,6 +121,13 @@ export default function RoadmapPage() {
     }
   }, [roadmapSteps, roadmapId]);
 
+  const triggerProgressRefresh = () => {
+    if (roadmapSteps.length > 0 && roadmapId) {
+      const calculatedProgress = calculateProgress(roadmapSteps, roadmapId);
+      setProgress(calculatedProgress);
+    }
+  };
+
   const getStepIcon = (status: string) => status === 'completed' ? <CheckCircle className="w-6 h-6 text-success" /> : <Circle className="w-6 h-6 text-muted-foreground" />;
   const getStepCardStyle = (status: string) => status === 'completed' ? 'bg-success/5 border-success/20' : 'bg-muted/20 border-muted-darker';
   const getDifficultyColor = (difficulty: string) => difficulty === 'Beginner' ? 'text-success bg-success/10' : 'text-muted-foreground bg-muted';
@@ -203,7 +210,7 @@ export default function RoadmapPage() {
 
         {viewMode === 'mindmap' ? (
           <div className="max-w-4xl mx-auto px-4 sm:px-0">
-            <RoadmapMindMap steps={roadmapSteps} roadmapId={roadmapId || ''} />
+            <RoadmapMindMap steps={roadmapSteps} roadmapId={roadmapId || ''} title={roadmapTitle} onProgressUpdate={triggerProgressRefresh} />
           </div>
         ) : (
           <div className="relative max-w-4xl mx-auto px-4 sm:px-0 progress-stagger-item animate-fadeInUp">
