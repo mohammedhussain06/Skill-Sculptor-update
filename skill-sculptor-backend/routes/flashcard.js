@@ -2,6 +2,7 @@ import express from "express";
 import passport from "passport";
 import Flashcard from "../models/Flashcard.js";
 import UserProgress from "../models/UserProgress.js";
+import { aiService } from "../AI/aiService.js";
 
 const router = express.Router();
 
@@ -14,8 +15,20 @@ router.post("/generate", async (req, res) => {
             return res.status(400).json({ error: "Text is required" });
         }
 
-        // Simple flashcard generation algorithm (can be enhanced with OpenAI API)
-        const flashcards = generateFlashcardsFromText(text, count, difficulty);
+        let flashcards;
+        try {
+            const cards = await aiService.generateFlashcards(text, count);
+            flashcards = cards.map((c, idx) => ({
+                title: `Flashcard ${idx + 1}`,
+                front: c.front,
+                back: c.back,
+                difficulty,
+                sourceText: text.length > 150 ? text.substring(0, 150) + "..." : text
+            }));
+        } catch (aiErr) {
+            console.warn("AI flashcard generation failed, using procedural fallback:", aiErr.message);
+            flashcards = generateFlashcardsFromText(text, count, difficulty);
+        }
         
         res.json({ flashcards });
     } catch (error) {
@@ -28,9 +41,20 @@ router.post("/generate", async (req, res) => {
 router.post("/", passport.authenticate("jwt", { session: false }), async (req, res) => {
     try {
         const { flashcards } = req.body;
-        
+
+        // Normalize difficulty from UI labels (Beginner/Intermediate/Advanced) to schema enum (easy/medium/hard)
+        const difficultyMap = {
+            beginner: "easy",   easy: "easy",
+            intermediate: "medium", medium: "medium",
+            advanced: "hard",   hard: "hard"
+        };
+
         const createdFlashcards = await Flashcard.insertMany(
-            flashcards.map(fc => ({ ...fc, userId: req.user._id }))
+            flashcards.map(fc => ({
+                ...fc,
+                difficulty: difficultyMap[(fc.difficulty || "medium").toLowerCase()] || "medium",
+                userId: req.user._id
+            }))
         );
 
         // Update user progress

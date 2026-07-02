@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, Circle, Clock, Play, GraduationCap, Lock, ZoomIn, ZoomOut, RotateCcw, Shield, Award, Sparkles, CheckSquare, Square, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StudyNotepadDrawer } from './StudyNotepadDrawer';
+import { AIChatTutorDrawer } from './AIChatTutorDrawer';
 
 interface Resource {
   title: string;
@@ -48,6 +49,7 @@ export function RoadmapMindMap({ steps, roadmapId, title, onProgressUpdate }: Ro
   const [completionsMap, setCompletionsMap] = useState<Record<number, number[]>>({});
   const [lastToggledKey, setLastToggledKey] = useState<string | null>(null);
   const [isNotesOpen, setIsNotesOpen] = useState<boolean>(false);
+  const [isTutorOpen, setIsTutorOpen] = useState<boolean>(false);
 
   // Drag-to-pan & Zoom states
   const [pan, setPan] = useState({ x: 100, y: 50 });
@@ -773,6 +775,15 @@ export function RoadmapMindMap({ steps, roadmapId, title, onProgressUpdate }: Ro
               Study Notes
             </Button>
 
+            <Button
+              variant="outline"
+              onClick={() => setIsTutorOpen(true)}
+              className="font-bold h-11 border-border bg-card hover:bg-muted text-foreground"
+            >
+              <Sparkles className="w-4 h-4 mr-2 text-emerald-400 fill-emerald-400/20" />
+              AI Tutor
+            </Button>
+
             {!isLevelUnlocked(selectedIdx) ? (
               <Button disabled className="font-bold h-11 border border-white/5 opacity-50">
                 <Lock className="w-4 h-4 mr-2" />
@@ -796,6 +807,16 @@ export function RoadmapMindMap({ steps, roadmapId, title, onProgressUpdate }: Ro
         isOpen={isNotesOpen}
         onClose={() => setIsNotesOpen(false)}
         roadmapId={roadmapId}
+        stepIdx={selectedIdx}
+        stepTitle={selectedStep.title}
+      />
+
+      {/* AI Study Tutor drawer */}
+      <AIChatTutorDrawer
+        isOpen={isTutorOpen}
+        onClose={() => setIsTutorOpen(false)}
+        roadmapId={roadmapId}
+        roadmapTitle={title || 'Skill Campaign'}
         stepIdx={selectedIdx}
         stepTitle={selectedStep.title}
       />

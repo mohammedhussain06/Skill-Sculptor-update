@@ -14,6 +14,7 @@ import ocrRoutes from "./routes/ocr.js";
 import flashcardRoutes from "./routes/flashcard.js";
 import quizRoutes from "./routes/quiz.js";
 import gamificationRoutes from "./routes/gamification.js";
+import chatTutorRoutes from "./routes/chatTutor.js";
 
 // Middleware
 import { errorHandler } from "./middleware/errorHandler.js";
@@ -63,6 +64,7 @@ app.use("/api/ocr", ocrRoutes);
 app.use("/api/flashcard", flashcardRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/gamification", gamificationRoutes);
+app.use("/api/chat-tutor", chatTutorRoutes);
 app.use(errorHandler);
 
 // Debug: DB and collection counts

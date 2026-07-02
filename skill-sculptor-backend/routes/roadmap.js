@@ -2,6 +2,7 @@ import express from "express";
 import Roadmap from "../models/Roadmap.js";
 import Dashboard from "../models/Dashboard.js";
 import passport from "passport";
+import { aiService } from "../AI/aiService.js";
 
 const router = express.Router();
 
@@ -26,104 +27,84 @@ const normalizeSkill = (skill) => {
     .join(' ');
 };
 
-// Helper to build diversified, level-aware resources
-async function buildResources(skill, levelTerm) {
+/**
+ * Build resources SPECIFIC to a single step using the step's topic query.
+ * Each step gets its own targeted YouTube, GitHub, StackOverflow, and course links.
+ * @param {string} query  - e.g. "Python List Comprehensions" or "React useEffect Hook"
+ * @param {string} level  - beginner | intermediate | advanced
+ * @param {number} idx    - step index (used to vary resource types per step)
+ */
+async function buildStepResources(query, level, idx = 0) {
+  const encodedQuery = encodeURIComponent(query);
+  const encodedQueryWithLevel = encodeURIComponent(`${query} ${level}`);
+
+  // Parallel fetch from live APIs
   const ytPromise = (async () => {
     if (process.env.YOUTUBE_API_KEY) {
-      const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=6&q=${encodeURIComponent(`${skill} ${levelTerm} tutorial`)}&key=${process.env.YOUTUBE_API_KEY}`;
+      const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=5&q=${encodedQueryWithLevel}&key=${process.env.YOUTUBE_API_KEY}`;
       const res = await fetch(url).catch(() => null);
-      return res?.json().catch(() => null);
+      const data = await res?.json().catch(() => null);
+      return data?.items?.map(it => ({
+        title: it.snippet?.title,
+        url: `https://www.youtube.com/watch?v=${it.id?.videoId}`,
+        type: 'video'
+      })).filter(r => r.url && r.title) || [];
     }
-    if (process.env.RAPIDAPI_KEY) {
-      const res = await fetch(`https://yt-api.p.rapidapi.com/search?query=${encodeURIComponent(`${skill} ${levelTerm} tutorial`)}`, {
-        headers: {
-          "X-RapidAPI-Key": process.env.RAPIDAPI_KEY || "",
-          "X-RapidAPI-Host": "yt-api.p.rapidapi.com",
-        },
-      }).catch(() => null);
-      return res?.json().catch(() => null);
-    }
-    return null;
+    return [];
   })();
 
-  const ghPromise = fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(`${skill} ${levelTerm} awesome list`)}&sort=stars&order=desc&per_page=10`)
-    .then(r => r.ok ? r.json() : null).catch(() => null);
+  const ghPromise = fetch(
+    `https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&sort=stars&order=desc&per_page=5`
+  ).then(r => r.ok ? r.json() : null).catch(() => null);
 
-  const soPromise = fetch(`https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&q=${encodeURIComponent(`${skill} ${levelTerm}`)}&site=stackoverflow&pagesize=10`)
-    .then(r => r.ok ? r.json() : null).catch(() => null);
+  const soPromise = fetch(
+    `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&q=${encodedQuery}&site=stackoverflow&pagesize=5`
+  ).then(r => r.ok ? r.json() : null).catch(() => null);
 
-  const normalizedSkill = normalizeSkill(skill);
-  const mdn = [
-    { title: `MDN Web Docs: ${normalizedSkill}`, url: `https://developer.mozilla.org/en-US/search?q=${encodeURIComponent(normalizedSkill)}` },
-    { title: 'MDN Web Docs', url: 'https://developer.mozilla.org/' }
-  ];
-  const w3 = [
-    { title: `W3Schools: ${normalizedSkill}`, url: `https://www.w3schools.com/search/?q=${encodeURIComponent(normalizedSkill)}` },
-    { title: 'W3Schools', url: 'https://www.w3schools.com/' }
-  ];
-  const fcc = [
-    { title: `freeCodeCamp: ${normalizedSkill}`, url: `https://www.freecodecamp.org/news/search/?query=${encodeURIComponent(normalizedSkill)}` },
-    { title: 'freeCodeCamp Curriculum', url: 'https://www.freecodecamp.org/learn/' },
-    { title: 'freeCodeCamp YouTube', url: 'https://www.youtube.com/c/Freecodecamp' }
-  ];
-  const coursera = [
-    { title: `Coursera: ${normalizedSkill}`, url: `https://www.coursera.org/search?query=${encodeURIComponent(`${normalizedSkill} ${levelTerm}`)}` },
-    { title: 'Coursera Specializations', url: 'https://www.coursera.org/browse' },
-    { title: 'Coursera Professional Certificates', url: 'https://www.coursera.org/professional-certificates' }
-  ];
-  const udemy = [
-    { title: `Udemy: ${normalizedSkill}`, url: `https://www.udemy.com/courses/search/?q=${encodeURIComponent(`${normalizedSkill} ${levelTerm}`)}` },
-    { title: 'Udemy Best Sellers', url: 'https://www.udemy.com/courses/development/' },
-    { title: 'Udemy Free Courses', url: 'https://www.udemy.com/courses/free/' }
-  ];
-  
-  // Additional resource sources - skill-specific
-  const additionalResources = [
-    { title: 'GitHub Learning Lab', url: 'https://lab.github.com/' },
-    { title: `Codecademy: ${normalizedSkill}`, url: `https://www.codecademy.com/search?query=${encodeURIComponent(normalizedSkill)}` },
-    { title: `Khan Academy: ${normalizedSkill}`, url: `https://www.khanacademy.org/search?page_search_query=${encodeURIComponent(normalizedSkill)}` },
-    { title: `edX: ${normalizedSkill}`, url: `https://www.edx.org/search?q=${encodeURIComponent(`${normalizedSkill} ${levelTerm}`)}` },
-    { title: `MIT OpenCourseWare: ${normalizedSkill}`, url: `https://ocw.mit.edu/search/?d=Electrical%20Engineering%20and%20Computer%20Science&s=${encodeURIComponent(normalizedSkill)}` },
-    { title: 'Reddit Programming', url: 'https://www.reddit.com/r/programming/' },
-    { title: `Dev.to: ${normalizedSkill}`, url: `https://dev.to/search?q=${encodeURIComponent(normalizedSkill)}` },
-    { title: `Medium: ${normalizedSkill}`, url: `https://medium.com/search?q=${encodeURIComponent(normalizedSkill)}` }
+  const [ytItems, ghData, soData] = await Promise.all([ytPromise, ghPromise, soPromise]);
+
+  const yt = ytItems || [];
+  const gh = ghData?.items?.map(r => ({ title: `GitHub: ${r.full_name} ⭐${r.stargazers_count?.toLocaleString()}`, url: r.html_url, type: 'github' }))?.slice(0, 3) || [];
+  const so = soData?.items?.map(q => ({ title: `StackOverflow: ${q.title}`, url: q.link, type: 'article' }))?.slice(0, 3) || [];
+
+  // Deep-link search URLs to major platforms — all scoped to the exact step query
+  const courseLinks = [
+    { title: `Udemy: "${query}"`, url: `https://www.udemy.com/courses/search/?q=${encodedQueryWithLevel}&sort=highest-rated`, type: 'course' },
+    { title: `Coursera: "${query}"`, url: `https://www.coursera.org/search?query=${encodedQueryWithLevel}`, type: 'course' },
+    { title: `edX: "${query}"`, url: `https://www.edx.org/search?q=${encodedQueryWithLevel}`, type: 'course' },
   ];
 
-  const [ytData, ghData, soData] = await Promise.all([ytPromise, ghPromise, soPromise]);
-  const yt = ytData?.items
-    ? ytData.items.map((it) => ({ title: it.snippet?.title, url: `https://www.youtube.com/watch?v=${it.id?.videoId}` })).filter(r => r.url).slice(0,6)
-    : (ytData?.data?.map((it) => ({ title: it.title, url: `https://www.youtube.com/watch?v=${it.videoId}` }))?.slice(0, 6) || []);
-  const gh = ghData?.items?.map((r) => ({ title: r.full_name, url: r.html_url }))?.slice(0, 6) || [];
-  const so = soData?.items?.map((q) => ({ title: q.title, url: q.link }))?.slice(0, 6) || [];
+  const articleLinks = [
+    { title: `Dev.to: "${query}"`, url: `https://dev.to/search?q=${encodedQuery}`, type: 'article' },
+    { title: `freeCodeCamp: "${query}"`, url: `https://www.freecodecamp.org/news/search/?query=${encodedQuery}`, type: 'article' },
+    { title: `Medium: "${query}"`, url: `https://medium.com/search?q=${encodedQuery}`, type: 'article' },
+    { title: `MDN: "${query}"`, url: `https://developer.mozilla.org/en-US/search?q=${encodedQuery}`, type: 'docs' },
+    { title: `GeeksforGeeks: "${query}"`, url: `https://www.geeksforgeeks.org/search/?query=${encodedQuery}`, type: 'article' },
+    { title: `Codecademy: "${query}"`, url: `https://www.codecademy.com/search?query=${encodedQuery}`, type: 'course' },
+  ];
 
-  const dedupe = (arr) => {
-    const seen = new Set();
-    return arr.filter(r => {
-      const key = r.url || r.title;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-  };
+  // Vary resource mix by step index so each step feels different
+  const resourceMixes = [
+    // Step 0 (intro): video-heavy + courses
+    [...yt.slice(0, 3), ...courseLinks.slice(0, 2), ...articleLinks.slice(0, 2), ...gh.slice(0, 1), ...so.slice(0, 1)],
+    // Step 1: balanced
+    [...yt.slice(0, 2), ...gh.slice(0, 2), ...courseLinks.slice(0, 1), ...articleLinks.slice(0, 3), ...so.slice(0, 1)],
+    // Step 2: article + stackoverflow + github
+    [...articleLinks.slice(0, 3), ...so.slice(0, 2), ...gh.slice(0, 2), ...yt.slice(0, 1), ...courseLinks.slice(0, 1)],
+    // Step 3+: github + stackoverflow + advanced articles
+    [...gh.slice(0, 3), ...so.slice(0, 3), ...articleLinks.slice(1, 4), ...courseLinks.slice(1, 2)],
+  ];
 
-  const beginner = dedupe([ ...yt.slice(0,5), ...mdn, ...w3, ...fcc, ...gh.slice(0,3), ...so.slice(0,3), ...coursera, ...udemy, ...additionalResources.slice(0,4) ]).slice(0,25);
-  const intermediate = dedupe([ ...yt.slice(0,4), ...gh.slice(0,8), ...so.slice(0,5), ...mdn, ...fcc, ...coursera, ...udemy, ...additionalResources.slice(0,6) ]).slice(0,25);
-  const advanced = dedupe([ ...yt.slice(0,3), ...gh.slice(0,10), ...so.slice(0,7), ...mdn, ...coursera, ...udemy, ...additionalResources.slice(0,8) ]).slice(0,25);
+  const mix = resourceMixes[Math.min(idx, resourceMixes.length - 1)];
 
-  // Return a detailed pool so different steps can get different subsets
-  const pool = levelTerm === 'advanced' ? advanced : levelTerm === 'intermediate' ? intermediate : beginner;
-
-  const bySource = {
-    yt,
-    gh,
-    so,
-    docs: dedupe([...mdn, ...w3]),
-    fcc,
-    courses: dedupe([...coursera, ...udemy]),
-    pool
-  };
-
-  return bySource;
+  // Dedupe and cap at 8 resources per step
+  const seen = new Set();
+  return mix.filter(r => {
+    if (!r?.url || !r?.title) return false;
+    if (seen.has(r.url)) return false;
+    seen.add(r.url);
+    return true;
+  }).slice(0, 8);
 }
 
 // ✅ Create Roadmap (optional, mostly for admin/testing)
@@ -134,22 +115,27 @@ router.post("/", passport.authenticate("jwt", { session: false }), async (req, r
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // Allow multiple roadmaps per user; do not block on existing records
-
     const resolvedGoal = goal || `Learn ${skill}`;
-
     const normalizedSkill = normalizeSkill(skill);
     const levelTerm = level === 'advanced' ? 'advanced' : level === 'intermediate' ? 'intermediate' : 'beginner';
-    const src = await buildResources(normalizedSkill, levelTerm);
-    const intro = dedupe([ ...src.yt.slice(0,4), ...src.docs.slice(0,3), ...src.fcc.slice(0,3), ...src.courses.slice(0,2), ...src.pool.slice(0,5) ]).slice(0,12);
-    const fundamentals = dedupe([ ...src.docs.slice(0,4), ...src.so.slice(0,4), ...src.yt.slice(3,7), ...src.courses.slice(0,3), ...src.pool.slice(5,10) ]).slice(0,12);
-    const projects = dedupe([ ...src.gh.slice(0,6), ...src.so.slice(3,7), ...src.docs.slice(0,2), ...src.pool.slice(10,15) ]).slice(0,12);
 
-    const steps = [
-      { title: levelTerm === 'advanced' ? `Advanced ${normalizedSkill} Concepts` : levelTerm === 'intermediate' ? `${normalizedSkill} Fundamentals` : `Introduction to ${normalizedSkill}`, status: "current", difficulty: levelTerm === 'advanced' ? 'Advanced' : levelTerm === 'intermediate' ? 'Intermediate' : 'Beginner', resources: intro },
-      { title: levelTerm === 'advanced' ? `Scalable ${normalizedSkill} Architectures` : levelTerm === 'intermediate' ? `Intermediate ${normalizedSkill} Projects` : `${normalizedSkill} Basics Practice`, status: "pending", difficulty: levelTerm, resources: fundamentals },
-      { title: levelTerm === 'advanced' ? `Performance & Optimization in ${normalizedSkill}` : levelTerm === 'intermediate' ? `Apply ${normalizedSkill} in Real Projects` : `First ${normalizedSkill} Project`, status: "pending", difficulty: levelTerm, resources: projects },
-    ];
+    // Call AI to generate custom steps
+    const aiSteps = await aiService.generateRoadmap(normalizedSkill, levelTerm, resolvedGoal);
+
+    // Build step-specific resources for each AI step using skill + step title as search query
+    const steps = await Promise.all(aiSteps.map(async (step, idx) => {
+      // Use both the skill and the step title for highly specific queries
+      const stepQuery = `${normalizedSkill} ${step.title.replace(/^Level\s*\d+:\s*/i, '')}`;
+      const stepResources = await buildStepResources(stepQuery, levelTerm, idx);
+
+      return {
+        title: step.title,
+        description: step.description || `Master core topics for ${step.title}`,
+        status: idx === 0 ? "current" : "pending",
+        difficulty: step.difficulty || levelTerm,
+        resources: stepResources
+      };
+    }));
 
     const roadmap = await Roadmap.create({ userId, skill: normalizedSkill, level, goal: resolvedGoal, steps });
     res.status(201).json({ message: "Roadmap created", roadmap });
@@ -199,16 +185,25 @@ router.get("/:id", passport.authenticate("jwt", { session: false }), async (req,
   try {
     const roadmap = await Roadmap.findById(req.params.id);
     if (!roadmap) return res.status(404).json({ message: "Roadmap not found" });
-    const needsEnrich = !roadmap.steps?.[0]?.resources?.[0]?.url;
-    if (needsEnrich) {
+
+    // Detect stale/generic resources — old system stored hardcoded generic links
+    const STALE_TITLES = ['MDN Web Docs', 'W3Schools', 'freeCodeCamp Curriculum', 'freeCodeCamp YouTube', 'Udemy Best Sellers', 'Udemy Free Courses', 'GitHub Learning Lab', 'Reddit Programming', 'Coursera Specializations'];
+    const firstTitle = roadmap.steps?.[0]?.resources?.[0]?.title || '';
+    const hasNoResources = !roadmap.steps?.[0]?.resources?.[0]?.url;
+    const hasStaleResources = STALE_TITLES.some(t => firstTitle.includes(t));
+
+    if (hasNoResources || hasStaleResources) {
       const normalizedSkill = normalizeSkill(roadmap.skill);
       const levelTerm = roadmap.level === 'advanced' ? 'advanced' : roadmap.level === 'intermediate' ? 'intermediate' : 'beginner';
-      const src = await buildResources(normalizedSkill, levelTerm);
-      const intro = dedupe([ ...src.yt.slice(0,3), ...src.docs.slice(0,2), ...src.fcc.slice(0,2), ...src.courses.slice(0,1) ]).slice(0,8);
-      const fundamentals = dedupe([ ...src.docs.slice(0,3), ...src.so.slice(0,3), ...src.yt.slice(2,5), ...src.courses.slice(0,2) ]).slice(0,8);
-      const projects = dedupe([ ...src.gh.slice(0,5), ...src.so.slice(2,5), ...src.docs.slice(0,1) ]).slice(0,8);
-      const perStep = [intro, fundamentals, projects];
-      roadmap.steps = roadmap.steps.map((s, idx) => ({ ...s.toObject(), resources: perStep[idx % perStep.length] }));
+      // Re-enrich each step with topic-specific resources
+      const enrichedSteps = await Promise.all(
+        roadmap.steps.map(async (s, idx) => {
+          const stepQuery = `${normalizedSkill} ${s.title.replace(/^Level\s*\d+:\s*/i, '')}`;
+          const resources = await buildStepResources(stepQuery, levelTerm, idx);
+          return { ...s.toObject(), resources };
+        })
+      );
+      roadmap.steps = enrichedSteps;
       await roadmap.save();
     }
     res.json(roadmap);
@@ -282,9 +277,11 @@ router.delete("/:id", passport.authenticate("jwt", { session: false }), async (r
       return res.status(404).json({ message: "Roadmap not found" });
     }
     
-    // Check if user owns this roadmap
+    // Check if user owns this roadmap (must compare as strings — ObjectId !== ObjectId by reference)
     const user = req.user;
-    if (roadmap.userId !== user._id && roadmap.userId !== user.id) {
+    const roadmapUserId = roadmap.userId?.toString();
+    const requestUserId = (user._id || user.id)?.toString();
+    if (roadmapUserId !== requestUserId) {
       return res.status(403).json({ message: "Not authorized to delete this roadmap" });
     }
     

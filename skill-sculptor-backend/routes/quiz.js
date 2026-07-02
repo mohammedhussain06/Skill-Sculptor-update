@@ -3,6 +3,7 @@ import passport from "passport";
 import Quiz from "../models/Quiz.js";
 import QuizAttempt from "../models/QuizAttempt.js";
 import UserProgress from "../models/UserProgress.js";
+import { aiService } from "../AI/aiService.js";
 
 const router = express.Router();
 
@@ -15,7 +16,20 @@ router.post("/generate", async (req, res) => {
             return res.status(400).json({ error: "Text is required" });
         }
 
-        const questions = generateMCQFromText(text, count, difficulty);
+        let questions;
+        try {
+            const raw = await aiService.generateQuiz(text, count, difficulty);
+            // Map AI field name (correctAnswerIndex) to Schema field name (correctAnswer)
+            questions = raw.map(q => ({
+                question: q.question,
+                options: q.options,
+                correctAnswer: q.correctAnswerIndex ?? q.correctAnswer ?? 0,
+                explanation: q.explanation || ""
+            }));
+        } catch (aiErr) {
+            console.warn("AI quiz generation failed, using procedural fallback:", aiErr.message);
+            questions = generateMCQFromText(text, count, difficulty);
+        }
         
         res.json({ questions });
     } catch (error) {
@@ -29,11 +43,19 @@ router.post("/", passport.authenticate("jwt", { session: false }), async (req, r
     try {
         const { title, description, questions, tags, sourceText } = req.body;
         
+        // Normalize correctAnswerIndex -> correctAnswer to support both manual and AI-generated questions
+        const normalizedQuestions = (questions || []).map(q => ({
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer ?? q.correctAnswerIndex ?? 0,
+            explanation: q.explanation || ""
+        }));
+
         const quiz = await Quiz.create({
             userId: req.user._id,
             title,
             description,
-            questions,
+            questions: normalizedQuestions,
             tags,
             sourceText
         });

@@ -4,7 +4,7 @@ import API from "../../api/axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Brain, ChevronLeft, ChevronRight, RotateCcw, Trash2 } from "lucide-react";
+import { Brain, ChevronLeft, ChevronRight, RotateCcw, Trash2, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const FlashcardsPage = () => {
@@ -13,6 +13,71 @@ const FlashcardsPage = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [showAnswer, setShowAnswer] = useState(false);
     const [loading, setLoading] = useState(true);
+
+    // Manual Creation Modal states
+    const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+    const [newCardTitle, setNewCardTitle] = useState("");
+    const [newCardFront, setNewCardFront] = useState("");
+    const [newCardBack, setNewCardBack] = useState("");
+    const [newCardDifficulty, setNewCardDifficulty] = useState("Beginner");
+
+    // AI Generation Modal states
+    const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+    const [aiTopic, setAiTopic] = useState("");
+    const [aiCount, setAiCount] = useState(8);
+    const [aiDifficulty, setAiDifficulty] = useState("Intermediate");
+    const [isAiGenerating, setIsAiGenerating] = useState(false);
+
+    const handleGenerateAiCards = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!aiTopic.trim()) {
+            toast.error("Please enter a topic");
+            return;
+        }
+
+        setIsAiGenerating(true);
+        try {
+            // Step 1: Generate flashcards from topic via backend
+            const genRes = await API.post("/flashcard/generate", {
+                text: aiTopic,
+                count: aiCount,
+                difficulty: aiDifficulty.toLowerCase()
+            });
+
+            const cards = genRes.data.flashcards || [];
+            if (cards.length === 0) {
+                toast.error("AI couldn't generate cards for this topic. Try another prompt.");
+                setIsAiGenerating(false);
+                return;
+            }
+
+            // Enrich card titles with the topic name
+            const enrichedCards = cards.map((c: any, idx: number) => ({
+                ...c,
+                title: c.front?.split(" ").slice(0, 4).join(" ") || `${aiTopic} – Card ${idx + 1}`,
+                difficulty: aiDifficulty
+            }));
+
+            // Step 2: Save generated cards to database
+            const saveRes = await API.post("/flashcard", {
+                flashcards: enrichedCards
+            });
+
+            const saved = saveRes.data.flashcards || [];
+            setFlashcards(prev => [...saved, ...prev]);
+            setCurrentIndex(0);
+            setIsAiModalOpen(false);
+            setAiTopic("");
+            
+            toast.success(`✅ ${saved.length} AI flashcards generated and saved!`);
+        } catch (error: any) {
+            console.error("AI Generation error:", error);
+            const msg = error?.response?.data?.error || error?.message || "Unknown error";
+            toast.error(`AI Flashcard Generation failed: ${msg}`);
+        } finally {
+            setIsAiGenerating(false);
+        }
+    };
 
     useEffect(() => {
         fetchFlashcards();
@@ -26,6 +91,40 @@ const FlashcardsPage = () => {
             toast.error("Failed to fetch flashcards");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleCreateManualCard = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newCardTitle.trim() || !newCardFront.trim() || !newCardBack.trim()) {
+            toast.error("Please fill in all required fields");
+            return;
+        }
+
+        try {
+            const response = await API.post("/flashcard", {
+                flashcards: [{
+                    title: newCardTitle,
+                    front: newCardFront,
+                    back: newCardBack,
+                    difficulty: newCardDifficulty
+                }]
+            });
+            
+            const newCreated = response.data.flashcards || [];
+            setFlashcards(prev => [...newCreated, ...prev]);
+            setCurrentIndex(0);
+            setIsManualModalOpen(false);
+            
+            // Clear fields
+            setNewCardTitle("");
+            setNewCardFront("");
+            setNewCardBack("");
+            setNewCardDifficulty("Beginner");
+            
+            toast.success("Flashcard created successfully!");
+        } catch (error) {
+            toast.error("Failed to create flashcard");
         }
     };
 
@@ -96,16 +195,174 @@ const FlashcardsPage = () => {
                         </div>
                         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold gradient-text">No Flashcards Yet</h2>
                         <p className="text-sm sm:text-base text-muted-foreground">
-                            Upload a document to generate flashcards automatically 🚀
+                            Generate cards with AI, upload a document, or create custom cards manually 🚀
                         </p>
-                        <Button 
-                            onClick={() => navigate("/upload")}
-                            className="bg-gradient-primary hover:opacity-90 border-0 text-sm sm:text-base"
-                        >
-                            Upload Document
-                        </Button>
+                        <div className="flex flex-wrap justify-center gap-3">
+                            <Button 
+                                onClick={() => setIsAiModalOpen(true)}
+                                className="bg-gradient-primary hover:opacity-90 border-0 text-sm sm:text-base"
+                            >
+                                Generate with AI
+                            </Button>
+                            <Button 
+                                onClick={() => navigate("/upload")}
+                                variant="outline"
+                                className="text-sm sm:text-base border-border bg-card text-foreground"
+                            >
+                                Upload Document
+                            </Button>
+                            <Button 
+                                onClick={() => setIsManualModalOpen(true)}
+                                variant="outline"
+                                className="text-sm sm:text-base border-border bg-card text-foreground"
+                            >
+                                Create Manually
+                            </Button>
+                        </div>
                     </div>
                 </div>
+
+                {/* AI Generation Modal - Empty State */}
+                {isAiModalOpen && (
+                    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                        <div className="bg-card border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl relative animate-fadeInUp">
+                            <button 
+                                onClick={() => setIsAiModalOpen(false)}
+                                className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            <h3 className="text-xl font-bold mb-1 text-foreground flex items-center gap-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                                <Brain className="w-5 h-5 text-primary" />
+                                Generate Flashcards with AI
+                            </h3>
+                            <p className="text-xs text-muted-foreground mb-4">Enter a topic and the AI will create smart flashcards instantly.</p>
+                            <form onSubmit={handleGenerateAiCards} className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Topic / Subject</label>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. React Hooks, Photosynthesis, World War 2"
+                                        value={aiTopic}
+                                        onChange={(e) => setAiTopic(e.target.value)}
+                                        className="w-full bg-muted/40 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-all"
+                                        required
+                                        autoFocus
+                                    />
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Number of Cards</label>
+                                        <select
+                                            value={aiCount}
+                                            onChange={(e) => setAiCount(Number(e.target.value))}
+                                            className="w-full bg-muted/40 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-all"
+                                        >
+                                            <option value={5}>5 cards</option>
+                                            <option value={8}>8 cards</option>
+                                            <option value={12}>12 cards</option>
+                                            <option value={15}>15 cards</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Difficulty</label>
+                                        <select
+                                            value={aiDifficulty}
+                                            onChange={(e) => setAiDifficulty(e.target.value)}
+                                            className="w-full bg-muted/40 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-all"
+                                        >
+                                            <option value="Beginner">Beginner</option>
+                                            <option value="Intermediate">Intermediate</option>
+                                            <option value="Advanced">Advanced</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <Button 
+                                    type="submit" 
+                                    disabled={isAiGenerating}
+                                    className="w-full bg-gradient-primary hover:opacity-90 border-0 text-white font-bold h-11 shadow-glow"
+                                >
+                                    {isAiGenerating ? (
+                                        <span className="flex items-center gap-2"><span className="animate-spin">⚙️</span> Generating...</span>
+                                    ) : (
+                                        <span className="flex items-center gap-2">✨ Generate {aiCount} Flashcards</span>
+                                    )}
+                                </Button>
+                            </form>
+                        </div>
+                    </div>
+                )}
+
+                {/* Manual Creation Modal - Empty State */}
+                {isManualModalOpen && (
+                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                        <div className="bg-card border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl relative animate-fadeInUp">
+                            <button 
+                                onClick={() => setIsManualModalOpen(false)}
+                                className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            <h3 className="text-xl font-bold mb-4 text-foreground flex items-center gap-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                                <Brain className="w-5 h-5 text-primary" />
+                                Create Flashcard Manually
+                            </h3>
+                            <form onSubmit={handleCreateManualCard} className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Card Title / Concept</label>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. Closure, Event Loop"
+                                        value={newCardTitle}
+                                        onChange={(e) => setNewCardTitle(e.target.value)}
+                                        className="w-full bg-muted/40 border border-border/40 rounded-xl px-3 py-2 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-all"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Front (Question / Prompt)</label>
+                                    <textarea
+                                        placeholder="What does event loop do in JavaScript?"
+                                        value={newCardFront}
+                                        onChange={(e) => setNewCardFront(e.target.value)}
+                                        rows={3}
+                                        className="w-full bg-muted/40 border border-border/40 rounded-xl px-3 py-2 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-all resize-none"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Back (Answer / Definition)</label>
+                                    <textarea
+                                        placeholder="It monitors the Call Stack and the Callback Queue to execute asynchronous callbacks..."
+                                        value={newCardBack}
+                                        onChange={(e) => setNewCardBack(e.target.value)}
+                                        rows={3}
+                                        className="w-full bg-muted/40 border border-border/40 rounded-xl px-3 py-2 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-all resize-none"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Difficulty</label>
+                                    <select
+                                        value={newCardDifficulty}
+                                        onChange={(e) => setNewCardDifficulty(e.target.value)}
+                                        className="w-full bg-muted/40 border border-border/40 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary transition-all"
+                                    >
+                                        <option value="Beginner">Beginner</option>
+                                        <option value="Intermediate">Intermediate</option>
+                                        <option value="Advanced">Advanced</option>
+                                    </select>
+                                </div>
+                                <Button 
+                                    type="submit" 
+                                    className="w-full bg-gradient-primary hover:opacity-90 border-0 text-white font-bold h-11 shadow-glow"
+                                >
+                                    Save Flashcard
+                                </Button>
+                            </form>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
@@ -123,9 +380,26 @@ const FlashcardsPage = () => {
                             </div>
                             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold gradient-text">Flashcards</h1>
                         </div>
-                        <Badge variant="outline" className="text-xs sm:text-sm bg-gradient-primary text-white border-0">
-                            {currentIndex + 1} / {flashcards.length}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                            <Button 
+                                size="sm"
+                                onClick={() => setIsAiModalOpen(true)}
+                                className="bg-gradient-primary hover:opacity-90 border-0 text-xs sm:text-sm font-bold"
+                            >
+                                Generate AI
+                            </Button>
+                            <Button 
+                                size="sm"
+                                onClick={() => setIsManualModalOpen(true)}
+                                variant="outline"
+                                className="border-border bg-card text-foreground text-xs sm:text-sm font-bold"
+                            >
+                                Add Card
+                            </Button>
+                            <Badge variant="outline" className="text-xs sm:text-sm bg-gradient-primary text-white border-0 py-1.5 px-2.5">
+                                {currentIndex + 1} / {flashcards.length}
+                            </Badge>
+                        </div>
                     </div>
 
                     <Card className="fun-card border-0 shadow-card bg-card/80 backdrop-blur-sm mb-4 sm:mb-6 min-h-[300px] sm:min-h-[350px] md:min-h-[400px] flex flex-col justify-center transition-all duration-300">
@@ -201,6 +475,148 @@ const FlashcardsPage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* AI Generation Modal - Main View */}
+            {isAiModalOpen && (
+                <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-card border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl relative animate-fadeInUp">
+                        <button 
+                            onClick={() => setIsAiModalOpen(false)}
+                            className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                        <h3 className="text-xl font-bold mb-1 text-foreground flex items-center gap-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                            <Brain className="w-5 h-5 text-primary" />
+                            Generate Flashcards with AI
+                        </h3>
+                        <p className="text-xs text-muted-foreground mb-4">Enter a topic and the AI will create smart flashcards instantly.</p>
+                        <form onSubmit={handleGenerateAiCards} className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Topic / Subject</label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. React Hooks, Photosynthesis, World War 2"
+                                    value={aiTopic}
+                                    onChange={(e) => setAiTopic(e.target.value)}
+                                    className="w-full bg-muted/40 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-all"
+                                    required
+                                    autoFocus
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Number of Cards</label>
+                                    <select
+                                        value={aiCount}
+                                        onChange={(e) => setAiCount(Number(e.target.value))}
+                                        className="w-full bg-muted/40 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-all"
+                                    >
+                                        <option value={5}>5 cards</option>
+                                        <option value={8}>8 cards</option>
+                                        <option value={12}>12 cards</option>
+                                        <option value={15}>15 cards</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Difficulty</label>
+                                    <select
+                                        value={aiDifficulty}
+                                        onChange={(e) => setAiDifficulty(e.target.value)}
+                                        className="w-full bg-muted/40 border border-border/40 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary transition-all"
+                                    >
+                                        <option value="Beginner">Beginner</option>
+                                        <option value="Intermediate">Intermediate</option>
+                                        <option value="Advanced">Advanced</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <Button 
+                                type="submit" 
+                                disabled={isAiGenerating}
+                                className="w-full bg-gradient-primary hover:opacity-90 border-0 text-white font-bold h-11 shadow-glow"
+                            >
+                                {isAiGenerating ? (
+                                    <span className="flex items-center gap-2"><span className="animate-spin">⚙️</span> Generating...</span>
+                                ) : (
+                                    <span className="flex items-center gap-2">✨ Generate {aiCount} Flashcards</span>
+                                )}
+                            </Button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Manual Creation Modal - Main View */}
+            {isManualModalOpen && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-card border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl relative animate-fadeInUp">
+                        <button 
+                            onClick={() => setIsManualModalOpen(false)}
+                            className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                        <h3 className="text-xl font-bold mb-4 text-foreground flex items-center gap-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                            <Brain className="w-5 h-5 text-primary" />
+                            Create Flashcard Manually
+                        </h3>
+                        <form onSubmit={handleCreateManualCard} className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Card Title / Concept</label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. Closure, Event Loop"
+                                    value={newCardTitle}
+                                    onChange={(e) => setNewCardTitle(e.target.value)}
+                                    className="w-full bg-muted/40 border border-border/40 rounded-xl px-3 py-2 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-all"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Front (Question / Prompt)</label>
+                                <textarea
+                                    placeholder="What does event loop do in JavaScript?"
+                                    value={newCardFront}
+                                    onChange={(e) => setNewCardFront(e.target.value)}
+                                    rows={3}
+                                    className="w-full bg-muted/40 border border-border/40 rounded-xl px-3 py-2 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-all resize-none"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Back (Answer / Definition)</label>
+                                <textarea
+                                    placeholder="It monitors the Call Stack and the Callback Queue to execute asynchronous callbacks..."
+                                    value={newCardBack}
+                                    onChange={(e) => setNewCardBack(e.target.value)}
+                                    rows={3}
+                                    className="w-full bg-muted/40 border border-border/40 rounded-xl px-3 py-2 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-all resize-none"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Difficulty</label>
+                                <select
+                                    value={newCardDifficulty}
+                                    onChange={(e) => setNewCardDifficulty(e.target.value)}
+                                    className="w-full bg-muted/40 border border-border/40 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary transition-all"
+                                >
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                </select>
+                            </div>
+                            <Button 
+                                type="submit" 
+                                className="w-full bg-gradient-primary hover:opacity-90 border-0 text-white font-bold h-11 shadow-glow"
+                            >
+                                Save Flashcard
+                            </Button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

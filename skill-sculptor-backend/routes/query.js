@@ -2,6 +2,7 @@ import express from "express";
 import Roadmap from "../models/Roadmap.js";
 import Dashboard from "../models/Dashboard.js";
 import verifyToken from "../middleware/verifyToken.js";
+import { aiService } from "../AI/aiService.js";
 
 // Simple providers using public search endpoints where possible
 // Use Node's built-in global fetch (Node 18+)
@@ -114,6 +115,12 @@ router.post("/", verifyToken, async (req, res, next) => {
       return res.status(400).json({ message: "All fields required" });
     }
 
+    const normalizedSkill = normalizeSkill(skill);
+    const normalizedLevel = (level || 'beginner').toLowerCase();
+
+    // Call AI to generate custom curriculum steps
+    const aiSteps = await aiService.generateRoadmap(normalizedSkill, normalizedLevel, steps || `Master ${normalizedSkill}`);
+
     // Aggregate resources
     const [yt, gh, so, mdn, w3, fcc, cou, ude] = await Promise.all([
       PROVIDERS.youtube(skill, level).catch(() => []),
@@ -126,8 +133,6 @@ router.post("/", verifyToken, async (req, res, next) => {
       PROVIDERS.udemy(skill, level).catch(() => []),
     ]);
 
-    // Level-specific resource grouping
-    const normalizedLevel = (level || 'beginner').toLowerCase();
     // Merge with simple de-duplication by URL
     const dedupe = (arr) => {
       const seen = new Set();
@@ -139,36 +144,33 @@ router.post("/", verifyToken, async (req, res, next) => {
       });
     };
 
-    const beginnerResources = dedupe([...
-      yt.slice(0, 5), ...gh.slice(0, 4), ...so.slice(0, 3), ...mdn, ...w3, ...fcc, ...cou, ...ude
-    ]);
-    const intermediateResources = dedupe([...
-      yt.slice(0, 4), ...gh.slice(0, 6), ...so.slice(0, 4), ...mdn, ...fcc, ...cou, ...ude
-    ]);
-    const advancedResources = dedupe([...
-      yt.slice(0, 3), ...gh.slice(0, 8), ...so.slice(0, 6), ...mdn, ...cou, ...ude
-    ]);
-
-    const choose = normalizedLevel === 'advanced' ? advancedResources : normalizedLevel === 'intermediate' ? intermediateResources : beginnerResources;
-
-    // Normalize skill once at the top
-    const normalizedSkill = normalizeSkill(skill);
-
-    // Fallbacks if providers return nothing - skill-specific
-    const fallback = [
+    const beginnerResources = dedupe([...yt, ...gh, ...so, ...mdn, ...w3, ...fcc, ...cou, ...ude]);
+    const choose = beginnerResources.length > 0 ? beginnerResources : [
       { title: `freeCodeCamp: ${normalizedSkill}`, url: `https://www.freecodecamp.org/news/search/?query=${encodeURIComponent(normalizedSkill)}` },
       { title: `MDN Web Docs: ${normalizedSkill}`, url: `https://developer.mozilla.org/en-US/search?q=${encodeURIComponent(normalizedSkill)}` },
       { title: `Coursera: ${normalizedSkill}`, url: `https://www.coursera.org/search?query=${encodeURIComponent(normalizedSkill)}` },
       { title: `Udemy: ${normalizedSkill}`, url: `https://www.udemy.com/courses/search/?q=${encodeURIComponent(normalizedSkill)}` },
     ];
 
-    const picked = (choose.length ? choose : fallback).slice(0, 15);
+    // Distribute resources dynamically across generated steps
+    const generatedSteps = aiSteps.map((step, idx) => {
+      const stepResources = dedupe([
+        ...yt.slice(idx, idx + 3),
+        ...mdn.slice(idx % 2, (idx % 2) + 2),
+        ...fcc.slice(idx % 3, (idx % 3) + 2),
+        ...cou.slice(idx % 2, (idx % 2) + 1),
+        ...gh.slice(idx, idx + 2),
+        ...choose.slice(idx * 2, (idx * 2) + 3)
+      ]).slice(0, 8);
 
-    const generatedSteps = [
-      { title: `Introduction to ${normalizedSkill}`, status: "current", difficulty: normalizedLevel === 'advanced' ? 'Advanced' : normalizedLevel === 'intermediate' ? 'Intermediate' : 'Beginner', resources: picked },
-      { title: `${normalizedSkill} Fundamentals`, status: "pending", difficulty: normalizedLevel, resources: picked },
-      { title: `Build ${normalizedSkill} Projects`, status: "pending", difficulty: normalizedLevel, resources: picked },
-    ];
+      return {
+        title: step.title,
+        description: step.description || `Master core topics for ${step.title}`,
+        status: idx === 0 ? "current" : "pending",
+        difficulty: step.difficulty || normalizedLevel,
+        resources: stepResources
+      };
+    });
 
     const roadmap = await Roadmap.create({ userId, skill: normalizedSkill, level: level || "beginner", steps: generatedSteps });
 
