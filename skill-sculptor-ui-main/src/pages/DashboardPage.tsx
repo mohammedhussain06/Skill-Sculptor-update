@@ -420,7 +420,7 @@ export default function DashboardPage() {
                       <span className="text-xs sm:text-sm break-words font-medium">Est. completion: {currentRoadmap.estimatedCompletion}</span>
                     </div>
                     <Button asChild className="bg-gradient-primary hover:opacity-90 border-0 w-full sm:w-auto text-sm sm:text-base font-semibold shadow-neon-sm">
-                      <Link to={multipleRoadmaps ? "/roadmaps" : (populatedFirst?._id ? `/roadmap/${populatedFirst._id}` : "/roadmap")} className="flex items-center justify-center space-x-2">
+                      <Link to={multipleRoadmaps ? "/roadmaps" : (populatedFirst?._id ? `/roadmap/${populatedFirst._id}` : "/roadmaps")} className="flex items-center justify-center space-x-2">
                         <span>Continue</span>
                         <ArrowRight className="w-4 h-4" />
                       </Link>

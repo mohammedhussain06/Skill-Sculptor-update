@@ -268,5 +268,127 @@ Tutor:`;
       console.error("Tutor AI execution failed:", err);
       return `Hello! I am ready to help you learn about ${context.stepTitle}.\n\n(Tutor Error Details: "${err.message}". Make sure to restart your backend Node server after saving your .env file, and verify your API key value!)`;
     }
+  },
+
+  // 5. AI Adaptive Learning Engine
+  // Analyzes quiz performance and returns recommendations for roadmap adjustment
+  adaptRoadmap: async (skill, steps, quizScore, weakTopics) => {
+    const stepSummary = steps.map((s, i) => `${i + 1}. ${s.title} (${s.difficulty})`).join("\n");
+    const prompt = `You are an expert curriculum designer. A learner studying "${skill}" just scored ${quizScore}% on a quiz.
+Their weak topics were: ${weakTopics.length > 0 ? weakTopics.join(", ") : "none identified"}.
+
+Current roadmap steps:
+${stepSummary}
+
+Based on the performance (${quizScore}%):
+- If score < 60%: recommend revisiting earlier steps and suggest inserting remedial steps
+- If score 60–80%: suggest continuing but flagging weak topics for review
+- If score > 80%: learner can advance, suggest accelerating or skipping beginner steps
+
+Return ONLY a valid JSON object in this exact format:
+{
+  "verdict": "advance" | "review" | "remediate",
+  "message": "Short encouraging message to the learner (1-2 sentences)",
+  "stepAdjustments": [
+    {
+      "stepIndex": 0,
+      "action": "keep" | "emphasize" | "skip" | "insert_before",
+      "reason": "Why this adjustment is recommended",
+      "newDifficulty": "Beginner" | "Intermediate" | "Advanced"
+    }
+  ],
+  "insertSteps": [
+    {
+      "title": "Remedial step title",
+      "description": "What this step covers",
+      "difficulty": "Beginner",
+      "insertBeforeIndex": 2
+    }
+  ]
+}`;
+
+    try {
+      const responseText = await requestAiText(prompt, true);
+      let cleaned = responseText.trim();
+      if (cleaned.includes("```")) {
+        const match = cleaned.match(/```(?:json)?([\s\S]*?)```/);
+        if (match && match[1]) cleaned = match[1].trim();
+      }
+      const startObj = cleaned.indexOf("{");
+      const endObj = cleaned.lastIndexOf("}");
+      if (startObj !== -1 && endObj !== -1) {
+        return JSON.parse(cleaned.substring(startObj, endObj + 1));
+      }
+      return JSON.parse(cleaned);
+    } catch (err) {
+      console.warn("AI adaptive learning failed, using score-based fallback:", err.message);
+      return {
+        verdict: quizScore >= 80 ? "advance" : quizScore >= 60 ? "review" : "remediate",
+        message: quizScore >= 80
+          ? "Great work! You're ready to move ahead. Keep up the momentum!"
+          : quizScore >= 60
+          ? "Good effort! Review the weak topics before moving on."
+          : "No worries — revisiting the basics will make you stronger. Take your time!",
+        stepAdjustments: [],
+        insertSteps: []
+      };
+    }
+  },
+
+  // 6. AI Study Planner
+  // Generates a personalized weekly study plan
+  generateStudyPlan: async (skills, hoursPerDay, daysPerWeek, startDate, goalDate) => {
+    const prompt = `You are an expert study coach. Create a personalized weekly study plan for a learner.
+
+Skills to learn: ${skills.join(", ")}
+Available study time: ${hoursPerDay} hours per day, ${daysPerWeek} days per week
+Start date: ${startDate}
+Target completion date: ${goalDate || "flexible"}
+
+Generate a structured ${daysPerWeek}-day weekly study schedule. For each day, provide 1-3 focused study sessions.
+
+Return ONLY a valid JSON array in this exact format:
+[
+  {
+    "day": "Monday",
+    "date": "YYYY-MM-DD",
+    "sessions": [
+      {
+        "time": "09:00 - 10:30",
+        "skill": "Python",
+        "topic": "Variables and Data Types",
+        "type": "learn" | "practice" | "review" | "project",
+        "duration": 90,
+        "description": "Brief description of what to study"
+      }
+    ],
+    "totalMinutes": 90,
+    "focus": "Main theme for the day"
+  }
+]`;
+
+    try {
+      const responseText = await requestAiText(prompt, true);
+      return extractJsonArray(responseText);
+    } catch (err) {
+      console.warn("AI study plan generation failed:", err.message);
+      // Fallback: generate a basic plan
+      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+      const activeDays = days.slice(0, daysPerWeek);
+      return activeDays.map((day, i) => ({
+        day,
+        date: "",
+        sessions: skills.map((skill, si) => ({
+          time: `${9 + si}:00 - ${9 + si}:00`.replace(/(\d+):00 - \1:00/, `${9 + si}:00 - ${9 + si + Math.floor(hoursPerDay / skills.length)}:00`),
+          skill,
+          topic: `${skill} — Session ${i + 1}`,
+          type: i % 3 === 0 ? "learn" : i % 3 === 1 ? "practice" : "review",
+          duration: Math.floor((hoursPerDay * 60) / skills.length),
+          description: `Study core concepts of ${skill}`
+        })),
+        totalMinutes: hoursPerDay * 60,
+        focus: `${skills[i % skills.length]} fundamentals`
+      }));
+    }
   }
 };

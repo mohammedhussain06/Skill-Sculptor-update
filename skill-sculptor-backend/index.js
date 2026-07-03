@@ -10,11 +10,11 @@ import authRoutes from "./routes/auth.js";
 import queryRoutes from "./routes/query.js";
 import roadmapRoutes from "./routes/roadmap.js";
 import dashboardRoutes from "./routes/dashboard.js";
-import ocrRoutes from "./routes/ocr.js";
 import flashcardRoutes from "./routes/flashcard.js";
 import quizRoutes from "./routes/quiz.js";
 import gamificationRoutes from "./routes/gamification.js";
 import chatTutorRoutes from "./routes/chatTutor.js";
+import aiRoutes from "./routes/ai.js";
 
 // Middleware
 import { errorHandler } from "./middleware/errorHandler.js";
@@ -60,11 +60,11 @@ app.use("/api/auth", authRoutes);
 app.use("/api/query", queryRoutes);
 app.use("/api/roadmap", roadmapRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/ocr", ocrRoutes);
 app.use("/api/flashcard", flashcardRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/gamification", gamificationRoutes);
 app.use("/api/chat-tutor", chatTutorRoutes);
+app.use("/api/ai", aiRoutes);
 app.use(errorHandler);
 
 // Debug: DB and collection counts

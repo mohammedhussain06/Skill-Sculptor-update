@@ -195,7 +195,7 @@ const FlashcardsPage = () => {
                         </div>
                         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold gradient-text">No Flashcards Yet</h2>
                         <p className="text-sm sm:text-base text-muted-foreground">
-                            Generate cards with AI, upload a document, or create custom cards manually 🚀
+                            Generate cards with AI or create custom cards manually 🚀
                         </p>
                         <div className="flex flex-wrap justify-center gap-3">
                             <Button 
@@ -203,13 +203,6 @@ const FlashcardsPage = () => {
                                 className="bg-gradient-primary hover:opacity-90 border-0 text-sm sm:text-base"
                             >
                                 Generate with AI
-                            </Button>
-                            <Button 
-                                onClick={() => navigate("/upload")}
-                                variant="outline"
-                                className="text-sm sm:text-base border-border bg-card text-foreground"
-                            >
-                                Upload Document
                             </Button>
                             <Button 
                                 onClick={() => setIsManualModalOpen(true)}

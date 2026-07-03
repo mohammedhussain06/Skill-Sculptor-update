@@ -161,6 +161,15 @@
     background: var(--background-gradient);
     min-height: 100vh;
     overflow-x: hidden;
+    color-scheme: dark;
+  }
+
+  /* Force native form elements to always use dark theme */
+  select, option, input[type="date"], input[type="time"], input[type="datetime-local"] {
+    color-scheme: dark;
+    background-color: hsl(var(--card));
+    color: hsl(var(--foreground));
+    border-color: hsl(var(--border));
   }
 
   h1, h2, h3 {

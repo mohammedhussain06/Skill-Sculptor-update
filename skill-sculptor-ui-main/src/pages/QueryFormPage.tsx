@@ -99,7 +99,7 @@ export default function QueryFormPage() {
 
       toast({ title: `Roadmap for "${formData.skill}" Generated! 🎯` });
       const roadmapId = roadmapRes.data.roadmap?._id;
-      navigate(roadmapId ? `/roadmap/${roadmapId}` : '/roadmap');
+      navigate(roadmapId ? `/roadmap/${roadmapId}` : '/roadmaps');
     } catch (err: any) {
       toast({
         title: "Error",

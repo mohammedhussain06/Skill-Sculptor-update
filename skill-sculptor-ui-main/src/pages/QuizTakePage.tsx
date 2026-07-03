@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
-import { Clock, Trophy, Award, TrendingUp, ArrowRight } from "lucide-react";
+import { Clock, Trophy, Award, TrendingUp, ArrowRight, Sparkles, Brain } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const QuizTakePage = () => {
@@ -22,6 +22,10 @@ const QuizTakePage = () => {
     const [showResults, setShowResults] = useState(false);
     const [results, setResults] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    // Adaptive Learning Engine state
+    const [adaptiveInsight, setAdaptiveInsight] = useState<any>(null);
+    const [isAdapting, setIsAdapting] = useState(false);
+    const [quizRoadmapId, setQuizRoadmapId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchQuiz();
@@ -61,15 +65,46 @@ const QuizTakePage = () => {
     const submitQuiz = async (finalAnswers: any[]) => {
         try {
             const totalTimeSpent = (Date.now() - startTime) / 1000;
-
             const response = await API.post(
                 `/quiz/${id}/attempt`,
                 { answers: finalAnswers, timeSpent: totalTimeSpent }
             );
-
-            setResults(response.data);
+            const data = response.data;
+            setResults(data);
             setShowResults(true);
-            toast.success(`Quiz completed! +${response.data.xpEarned} XP`);
+            toast.success(`Quiz completed! +${data.xpEarned} XP`);
+
+            // ── AI Adaptive Learning Engine ──
+            // Find weak topics from wrong answers
+            const weakTopics = quiz.questions
+                .filter((_: any, qi: number) => !data.attempt.answers[qi]?.isCorrect)
+                .map((q: any) => q.question?.slice(0, 60));
+
+            // Try to find linked roadmap from session storage
+            const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+            const userId = user._id || user.id;
+            if (userId) {
+                try {
+                    setIsAdapting(true);
+                    // Get the user's most recent roadmap
+                    const dashRes = await API.get(`/dashboard/${userId}`);
+                    const roadmapId = dashRes.data?.dashboard?.savedRoadmaps?.[0]?.roadmapId?._id
+                        || dashRes.data?.dashboard?.savedRoadmaps?.[0]?.roadmapId;
+                    if (roadmapId) {
+                        setQuizRoadmapId(roadmapId);
+                        const adaptRes = await API.post('/ai/adapt-roadmap', {
+                            roadmapId,
+                            quizScore: Math.round(data.percentage),
+                            weakTopics
+                        });
+                        setAdaptiveInsight(adaptRes.data);
+                    }
+                } catch (adaptErr) {
+                    console.warn('Adaptive learning engine skipped:', adaptErr);
+                } finally {
+                    setIsAdapting(false);
+                }
+            }
         } catch (error) {
             toast.error("Failed to submit quiz");
         }
@@ -215,6 +250,51 @@ const QuizTakePage = () => {
                                         })}
                                     </div>
                                 </div>
+
+                                {/* ── AI Adaptive Learning Insight ── */}
+                                {(isAdapting || adaptiveInsight) && (
+                                    <div className={`rounded-xl border p-4 space-y-2 ${
+                                        adaptiveInsight?.verdict === 'advance' ? 'bg-green-500/10 border-green-500/30' :
+                                        adaptiveInsight?.verdict === 'review'  ? 'bg-yellow-500/10 border-yellow-500/30' :
+                                        'bg-red-500/10 border-red-500/30'
+                                    }`}>
+                                        <div className="flex items-center gap-2 font-bold text-sm">
+                                            {isAdapting
+                                                ? <><span className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /> Analyzing your roadmap...</>
+                                                : <><Brain className="w-4 h-4" /> AI Adaptive Learning Engine</>}
+                                        </div>
+                                        {adaptiveInsight && !isAdapting && (
+                                            <>
+                                                <p className="text-sm text-foreground">{adaptiveInsight.message}</p>
+                                                <div className="flex gap-2 flex-wrap">
+                                                    <Badge variant="outline" className="text-xs capitalize">
+                                                        Verdict: {adaptiveInsight.verdict}
+                                                    </Badge>
+                                                    {adaptiveInsight.insertedSteps > 0 && (
+                                                        <Badge variant="outline" className="text-xs">
+                                                            +{adaptiveInsight.insertedSteps} remedial steps added
+                                                        </Badge>
+                                                    )}
+                                                    {adaptiveInsight.stepAdjustments?.length > 0 && (
+                                                        <Badge variant="outline" className="text-xs">
+                                                            {adaptiveInsight.stepAdjustments.length} steps adjusted
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                                {adaptiveInsight.verdict !== 'advance' && (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="text-xs h-7"
+                                                        onClick={() => navigate(`/roadmap/${quizRoadmapId || adaptiveInsight?.updatedRoadmap?._id || ''}`)}
+                                                    >
+                                                        <Sparkles className="w-3 h-3 mr-1" /> View Updated Roadmap
+                                                    </Button>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                )}
 
                                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                                     <Button 

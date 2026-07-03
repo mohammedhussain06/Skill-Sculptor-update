@@ -38,6 +38,48 @@ export default function PlannerPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // ── AI Study Planner State ──
+  const [isAiPlannerOpen, setIsAiPlannerOpen] = useState(false);
+  const [aiPlanSkills, setAiPlanSkills] = useState<string>('');
+  const [aiPlanHours, setAiPlanHours] = useState<number>(2);
+  const [aiPlanDays, setAiPlanDays] = useState<number>(5);
+  const [aiPlanGoalDate, setAiPlanGoalDate] = useState<string>('');
+  const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
+  const [generatedPlan, setGeneratedPlan] = useState<any[]>([]);
+  const [showGeneratedPlan, setShowGeneratedPlan] = useState(false);
+
+  const handleGenerateAiPlan = async () => {
+    const skillList = aiPlanSkills.split(',').map(s => s.trim()).filter(Boolean);
+    if (skillList.length === 0) {
+      toast({ title: 'Please enter at least one skill', variant: 'destructive' });
+      return;
+    }
+    setIsGeneratingPlan(true);
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const res = await API.post('/ai/generate-study-plan', {
+        skills: skillList,
+        hoursPerDay: aiPlanHours,
+        daysPerWeek: aiPlanDays,
+        startDate: today,
+        goalDate: aiPlanGoalDate || undefined
+      });
+      setGeneratedPlan(res.data.plan || []);
+      setShowGeneratedPlan(true);
+      setIsAiPlannerOpen(false);
+      toast({ title: '✅ AI Study Plan Generated!' });
+    } catch (err: any) {
+      toast({
+        title: 'Failed to generate study plan',
+        description: err?.response?.data?.error || err?.message || 'Unknown error',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsGeneratingPlan(false);
+    }
+  };
+
+
   const user = JSON.parse(sessionStorage.getItem('user') || '{}');
   const userId = user._id || user.id;
 
@@ -369,6 +411,12 @@ export default function PlannerPage() {
           </div>
           <div className="mt-4 md:mt-0 flex justify-center gap-2">
             <Button
+              onClick={() => setIsAiPlannerOpen(true)}
+              className="bg-gradient-primary hover:opacity-90 border-0 font-bold text-xs flex items-center gap-1.5"
+            >
+              <Sparkles className="w-3.5 h-3.5" /> Generate AI Plan
+            </Button>
+            <Button
               variant="outline"
               onClick={() => navigate('/dashboard')}
               className="font-bold border-white/10 hover:bg-white/5 text-foreground text-xs"
@@ -377,6 +425,133 @@ export default function PlannerPage() {
             </Button>
           </div>
         </div>
+
+        {/* ── AI Generated Study Plan ── */}
+        {showGeneratedPlan && generatedPlan.length > 0 && (
+          <Card className="border border-primary/20 bg-primary/5 shadow-xl">
+            <CardHeader className="p-5 flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  AI-Generated Weekly Study Plan
+                </CardTitle>
+                <CardDescription className="text-xs mt-1">Personalized schedule based on your skills and availability</CardDescription>
+              </div>
+              <button onClick={() => setShowGeneratedPlan(false)} className="text-muted-foreground hover:text-foreground text-xl leading-none">&times;</button>
+            </CardHeader>
+            <CardContent className="p-5 pt-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+                {generatedPlan.map((dayPlan: any, dayIdx: number) => (
+                  <div key={dayIdx} className="rounded-xl border border-white/10 bg-card/50 p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-sm text-foreground">{dayPlan.day}</span>
+                      <span className="text-xs text-muted-foreground">{dayPlan.totalMinutes}min</span>
+                    </div>
+                    {dayPlan.focus && (
+                      <p className="text-xs text-primary/80 font-medium">{dayPlan.focus}</p>
+                    )}
+                    <div className="space-y-1.5">
+                      {dayPlan.sessions?.map((session: any, si: number) => (
+                        <div key={si} className={`rounded-lg p-2 text-xs ${
+                          session.type === 'learn' ? 'bg-blue-500/10 border border-blue-500/20' :
+                          session.type === 'practice' ? 'bg-green-500/10 border border-green-500/20' :
+                          session.type === 'review' ? 'bg-yellow-500/10 border border-yellow-500/20' :
+                          'bg-purple-500/10 border border-purple-500/20'
+                        }`}>
+                          <div className="font-semibold text-foreground">{session.skill}</div>
+                          <div className="text-muted-foreground">{session.topic}</div>
+                          <div className="flex justify-between mt-1">
+                            <span className="capitalize text-xs opacity-70">{session.type}</span>
+                            <span className="opacity-70">{session.duration}min</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* ── AI Planner Modal ── */}
+        {isAiPlannerOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+            <div className="bg-card border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-black flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-primary" /> AI Study Planner
+                </h2>
+                <button onClick={() => setIsAiPlannerOpen(false)} className="text-muted-foreground hover:text-foreground text-2xl leading-none">&times;</button>
+              </div>
+              <p className="text-xs text-muted-foreground">Tell the AI what you want to learn and it will generate a personalized weekly schedule.</p>
+
+              <div>
+                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Skills to Learn</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Python, React, Machine Learning"
+                  value={aiPlanSkills}
+                  onChange={e => setAiPlanSkills(e.target.value)}
+                  className="w-full bg-muted/40 border border-border/40 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-all"
+                  autoFocus
+                />
+                <p className="text-xs text-muted-foreground mt-1">Separate multiple skills with commas</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Hours / Day</label>
+                  <select
+                    value={aiPlanHours}
+                    onChange={e => setAiPlanHours(Number(e.target.value))}
+                    style={{ colorScheme: 'dark' }}
+                    className="w-full bg-card border border-white/10 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary appearance-none cursor-pointer"
+                  >
+                    {[1,2,3,4,5,6].map(h => <option key={h} value={h} className="bg-card text-foreground">{h} hour{h > 1 ? 's' : ''}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Days / Week</label>
+                  <select
+                    value={aiPlanDays}
+                    onChange={e => setAiPlanDays(Number(e.target.value))}
+                    style={{ colorScheme: 'dark' }}
+                    className="w-full bg-card border border-white/10 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary appearance-none cursor-pointer"
+                  >
+                    {[3,4,5,6,7].map(d => <option key={d} value={d} className="bg-card text-foreground">{d} days</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Target Completion Date (optional)</label>
+                <input
+                  type="date"
+                  value={aiPlanGoalDate}
+                  onChange={e => setAiPlanGoalDate(e.target.value)}
+                  style={{ colorScheme: 'dark' }}
+                  className="w-full bg-card border border-white/10 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary"
+                />
+              </div>
+
+              <Button
+                onClick={handleGenerateAiPlan}
+                disabled={isGeneratingPlan || !aiPlanSkills.trim()}
+                className="w-full bg-gradient-primary hover:opacity-90 border-0 font-bold h-11"
+              >
+                {isGeneratingPlan ? (
+                  <span className="flex items-center gap-2">
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Generating your plan...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> Generate Weekly Schedule</span>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* ── FOCUS HEATMAP CARD ── */}
         <Card className="glass-card border-0 bg-card/30 backdrop-blur-xl border-white/5 shadow-xl">
@@ -481,7 +656,7 @@ export default function PlannerPage() {
                         key={idx}
                         className={cn(
                           "w-3.5 h-3.5 rounded-sm transition-all duration-300 relative group cursor-pointer",
-                          intensity === 0 && "bg-neutral-200/50 dark:bg-white/5 border border-neutral-300/30 dark:border-white/5 hover:bg-neutral-300/50 dark:hover:bg-white/10",
+                          intensity === 0 && "bg-white/5 border border-white/8 hover:bg-white/10",
                           intensity === 1 && "bg-emerald-500/20 border border-emerald-500/10 hover:bg-emerald-500/35",
                           intensity === 2 && "bg-emerald-500/45 border border-emerald-500/20 hover:bg-emerald-500/60",
                           intensity === 3 && "bg-emerald-500/70 border border-emerald-500/35 hover:bg-emerald-500/85",
@@ -504,7 +679,7 @@ export default function PlannerPage() {
               {/* Legend */}
               <div className="flex items-center justify-end space-x-1.5 mt-3 text-[10px] font-bold text-muted-foreground select-none">
                 <span>Less</span>
-                <div className="w-2.5 h-2.5 rounded-sm bg-neutral-200/50 dark:bg-white/5 border border-neutral-300/30 dark:border-white/5" />
+                <div className="w-2.5 h-2.5 rounded-sm bg-white/5 border border-white/8" />
                 <div className="w-2.5 h-2.5 rounded-sm bg-emerald-500/20" />
                 <div className="w-2.5 h-2.5 rounded-sm bg-emerald-500/45" />
                 <div className="w-2.5 h-2.5 rounded-sm bg-emerald-500/70" />
@@ -639,7 +814,7 @@ export default function PlannerPage() {
                       <div 
                         key={item.id} 
                         onClick={() => handleToggleMilestone(item.id)}
-                        className="p-3 rounded-xl bg-neutral-50 dark:bg-white/3 border border-neutral-200 dark:border-white/5 hover:bg-neutral-100 dark:hover:bg-white/5 hover:border-neutral-300 dark:hover:border-white/10 cursor-pointer flex items-start justify-between gap-3 group transition-all"
+                        className="p-3 rounded-xl bg-white/3 border border-white/5 hover:bg-white/5 hover:border-white/10 cursor-pointer flex items-start justify-between gap-3 group transition-all"
                       >
                         <div className="min-w-0">
                           <h4 className="text-xs font-bold text-foreground truncate">{item.stepTitle}</h4>

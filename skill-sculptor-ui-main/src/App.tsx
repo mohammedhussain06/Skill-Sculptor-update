@@ -20,9 +20,6 @@ import PlannerPage from '@/pages/PlannerPage';
 import RoadmapPage from '@/pages/RoadmapPage';
 import RoadmapListPage from '@/pages/RoadmapListPage';
 import LearnStepPage from '@/pages/LearnStepPage';
-import FlashcardGeneratePage from '@/pages/FlashcardGeneratePage';
-import QuizGeneratePage from '@/pages/QuizGeneratePage';
-import UploadPage from '@/pages/UploadPage';
 import { ThreeBackground } from '@/components/effects/ThreeBackground';
 import { FocusWidget } from '@/components/FocusWidget';
 
@@ -61,11 +58,6 @@ function App() {
                   {/* Auth pages - full width */}
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/signup" element={<SignupPage />} />
-                  
-                  {/* Public generation routes - full width */}
-                  <Route path="/flashcards/generate" element={<FlashcardGeneratePage />} />
-                  <Route path="/quiz/generate" element={<QuizGeneratePage />} />
-                  <Route path="/upload" element={<UploadPage />} />
                     
                     {/* Protected routes */}
                     <Route

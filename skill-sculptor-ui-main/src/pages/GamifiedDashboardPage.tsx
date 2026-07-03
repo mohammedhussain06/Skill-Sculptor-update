@@ -279,8 +279,8 @@ const GamifiedDashboardPage = () => {
                         </CardHeader>
                         <CardContent className="p-4 sm:p-6 pt-0">
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                                <Button onClick={() => navigate("/upload")} className="w-full bg-gradient-primary border-0 font-bold h-11 text-sm btn-student text-white">
-                                    Upload Document
+                                <Button onClick={() => navigate("/query-form")} className="w-full bg-gradient-primary border-0 font-bold h-11 text-sm btn-student text-white">
+                                    Create New Roadmap
                                 </Button>
                                 <Button onClick={() => navigate("/flashcards")} variant="outline" className="w-full border-white/10 hover:bg-white/10 hover:border-white/20 h-11 font-semibold text-sm">
                                     Practice Flashcards

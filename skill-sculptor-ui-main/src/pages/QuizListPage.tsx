@@ -210,13 +210,6 @@ const QuizListPage = () => {
                                 Generate AI
                             </Button>
                             <Button 
-                                onClick={() => navigate("/upload")} 
-                                variant="outline"
-                                className="flex-1 sm:flex-initial border-border bg-card text-foreground text-xs sm:text-sm h-10 px-4 font-bold"
-                            >
-                                Upload Document
-                            </Button>
-                            <Button 
                                 onClick={() => setIsManualModalOpen(true)} 
                                 variant="outline"
                                 className="flex-1 sm:flex-initial border-border bg-card text-foreground text-xs sm:text-sm h-10 px-4 font-bold"
@@ -234,7 +227,7 @@ const QuizListPage = () => {
                                 </div>
                                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3 text-center">No Quizzes Yet</h2>
                                 <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 text-center max-w-md">
-                                    Upload a document to generate your first quiz via AI, or build a custom quiz manually! 🚀
+                                    Generate your first quiz via AI, or build a custom quiz manually! 🚀
                                 </p>
                                 <div className="flex flex-wrap gap-3 justify-center">
                                     <Button 
@@ -243,13 +236,6 @@ const QuizListPage = () => {
                                     >
                                         <Plus className="w-4 h-4 mr-2" />
                                         Generate with AI
-                                    </Button>
-                                    <Button 
-                                        onClick={() => navigate("/upload")}
-                                        variant="outline"
-                                        className="border-border bg-card text-foreground text-sm sm:text-base font-bold"
-                                    >
-                                        Upload Document
                                     </Button>
                                     <Button 
                                         onClick={() => setIsManualModalOpen(true)}
