@@ -85,6 +85,17 @@ router.get("/", passport.authenticate("jwt", { session: false }), async (req, re
     }
 });
 
+// Get all quiz attempts for user
+router.get("/user/attempts", passport.authenticate("jwt", { session: false }), async (req, res) => {
+    try {
+        const attempts = await QuizAttempt.find({ userId: req.user._id }).sort({ completedAt: -1 });
+        res.json({ attempts });
+    } catch (error) {
+        console.error("User attempts fetch error:", error);
+        res.status(500).json({ error: "Failed to fetch user quiz attempts" });
+    }
+});
+
 // Get single quiz
 router.get("/:id", passport.authenticate("jwt", { session: false }), async (req, res) => {
     try {

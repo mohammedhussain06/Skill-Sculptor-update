@@ -1,6 +1,7 @@
 import express from "express";
 import passport from "passport";
 import Roadmap from "../models/Roadmap.js";
+import QuizAttempt from "../models/QuizAttempt.js";
 import { aiService } from "../AI/aiService.js";
 
 const router = express.Router();
@@ -128,6 +129,34 @@ router.post("/generate-study-plan", passport.authenticate("jwt", { session: fals
     } catch (err) {
         console.error("Study plan generation error:", err);
         res.status(500).json({ error: "Failed to generate study plan: " + err.message });
+    }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 3. AI STUDY ANALYTICS & PREDICTIONS
+//    POST /api/ai/analytics-insights
+//    Generates milestone forecasts, learning velocity metrics, next study topics, and learning curve points
+// ─────────────────────────────────────────────────────────────────────────────
+router.post("/analytics-insights", passport.authenticate("jwt", { session: false }), async (req, res) => {
+    try {
+        const { focusLogs = {} } = req.body;
+
+        // Query active roadmaps for the user
+        const roadmaps = await Roadmap.find({ userId: req.user._id });
+
+        // Query all quiz attempts for the user
+        const quizAttempts = await QuizAttempt.find({ userId: req.user._id }).sort({ completedAt: -1 });
+
+        const insights = await aiService.generateAnalyticsInsights(
+            roadmaps,
+            quizAttempts,
+            focusLogs
+        );
+
+        res.json({ insights });
+    } catch (err) {
+        console.error("AI analytics insights error:", err);
+        res.status(500).json({ error: "Failed to generate analytics insights: " + err.message });
     }
 });
 

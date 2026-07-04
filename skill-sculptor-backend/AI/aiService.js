@@ -390,5 +390,115 @@ Return ONLY a valid JSON array in this exact format:
         focus: `${skills[i % skills.length]} fundamentals`
       }));
     }
+  },
+
+  // 7. AI Study Analytics & Predictions
+  // Generates milestone forecasts, learning velocity metrics, next study topics, and learning curve points
+  generateAnalyticsInsights: async (roadmaps, quizAttempts, focusLogs) => {
+    const roadmapSummary = roadmaps.map((r, ri) => {
+      const completedSteps = r.steps?.filter(s => s.status === 'completed' || s.completed).length || 0;
+      const totalSteps = r.steps?.length || 0;
+      return `- Roadmap ${ri + 1}: "${r.skill}" (${completedSteps}/${totalSteps} steps completed)`;
+    }).join("\n");
+
+    const quizSummary = quizAttempts.slice(0, 10).map((q, qi) => {
+      return `- Quiz ${qi + 1}: Score ${q.score}/${q.answers?.length || 5} (${q.percentage}%), Completed: ${q.completedAt || 'recently'}`;
+    }).join("\n");
+
+    const focusSummary = Object.entries(focusLogs || {})
+      .slice(-7)
+      .map(([date, sec]) => `${date}: ${Math.round(sec / 60)} minutes`)
+      .join("\n");
+
+    const prompt = `You are an expert study analytics AI. Analyze the learner's study metrics and output deep predictive insights.
+
+Active Roadmaps:
+${roadmapSummary || "No active roadmaps."}
+
+Recent Quiz Attempts:
+${quizSummary || "No quiz attempts yet."}
+
+Focus Logs (past 7 days):
+${focusSummary || "No focus sessions logged yet."}
+
+Based on this data:
+1. Estimate the remaining study hours/days to complete their active milestones.
+2. Determine their learning velocity status ("accelerating", "steady", or "lagging") with a reason.
+3. Recommend specific next topics to study. Prioritize topics from incorrect quiz answers (weak topics) and then the next pending steps in active roadmaps.
+4. Generate a 5-point learning curve representing progress index (0 to 100). The first 3 points should represent historical progress, and the last 2 points should be predicted/forecasted future progress.
+
+Return ONLY a valid JSON object in this exact format:
+{
+  "milestoneForecast": {
+    "hoursRemaining": 15,
+    "estimatedDays": 6,
+    "forecastMessage": "Short encouraging message estimating completion of active targets"
+  },
+  "learningVelocity": {
+    "status": "accelerating" | "steady" | "lagging",
+    "score": 85,
+    "reason": "Short summary of why they got this status"
+  },
+  "recommendedNextTopics": [
+    {
+      "topic": "Topic Name",
+      "reason": "Why they should study this (e.g. missed in recent quiz, or next roadmap step)"
+    }
+  ],
+  "learningCurve": [
+    {"session": "Session 1", "progress": 20, "isPredicted": false},
+    {"session": "Session 2", "progress": 35, "isPredicted": false},
+    {"session": "Session 3", "progress": 50, "isPredicted": false},
+    {"session": "Session 4 (AI)", "progress": 68, "isPredicted": true},
+    {"session": "Session 5 (AI)", "progress": 85, "isPredicted": true}
+  ]
+}`;
+
+    try {
+      const responseText = await requestAiText(prompt, true);
+      let cleaned = responseText.trim();
+      if (cleaned.includes("```")) {
+        const match = cleaned.match(/```(?:json)?([\s\S]*?)```/);
+        if (match && match[1]) cleaned = match[1].trim();
+      }
+      const startObj = cleaned.indexOf("{");
+      const endObj = cleaned.lastIndexOf("}");
+      if (startObj !== -1 && endObj !== -1) {
+        return JSON.parse(cleaned.substring(startObj, endObj + 1));
+      }
+      return JSON.parse(cleaned);
+    } catch (err) {
+      console.warn("AI analytics insights failed, using fallback:", err.message);
+      // Construct logical fallback
+      const totalSteps = roadmaps.reduce((acc, r) => acc + (r.steps?.length || 0), 0);
+      const completedSteps = roadmaps.reduce((acc, r) => acc + (r.steps?.filter(s => s.status === 'completed' || s.completed).length || 0), 0);
+      const progressPercent = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 10;
+
+      return {
+        milestoneForecast: {
+          hoursRemaining: Math.max(5, (totalSteps - completedSteps) * 2),
+          estimatedDays: Math.max(2, Math.ceil((totalSteps - completedSteps) / 1.5)),
+          forecastMessage: "Keep making steady progress to complete your active milestones!"
+        },
+        learningVelocity: {
+          status: "steady",
+          score: 75,
+          reason: "You are maintaining a steady pace. Complete more quiz sessions and focus blocks to accelerate."
+        },
+        recommendedNextTopics: [
+          {
+            "topic": roadmaps[0]?.steps?.find(s => s.status !== 'completed' && !s.completed)?.title || "Review Fundamentals",
+            "reason": "Next upcoming step on your active learning path."
+          }
+        ],
+        learningCurve: [
+          {"session": "Session 1", "progress": Math.max(5, Math.round(progressPercent * 0.5)), "isPredicted": false},
+          {"session": "Session 2", "progress": Math.max(10, Math.round(progressPercent * 0.8)), "isPredicted": false},
+          {"session": "Session 3", "progress": Math.max(15, progressPercent), "isPredicted": false},
+          {"session": "Session 4 (AI)", "progress": Math.min(95, Math.max(20, progressPercent + 10)), "isPredicted": true},
+          {"session": "Session 5 (AI)", "progress": Math.min(100, Math.max(25, progressPercent + 20)), "isPredicted": true}
+        ]
+      };
+    }
   }
 };
